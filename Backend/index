@@ -1,0 +1,40 @@
+//index.js is the file the backend run through
+//here we are creating the server, mysql database connection, and more
+const http = require('http');
+const mysql = require('mysql2');
+
+
+//creating server
+const server = http.createServer((request, response)=>{
+  response.write("Helllo World!");
+  response.end();
+});
+
+//creating database connection
+const connection = mysql.createConnection({
+  host:'localhost',
+  user: 'root',
+  password: 'moths63W84fg',
+  database: 'test'
+});
+
+//connecting database
+connection.connect(function(err)
+  {
+    if (err){console.log("error occurred while attempting connection: ", err)}
+    else {console.log("database connection successful!")}
+  }
+);
+
+//inserting data into database
+var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
+connection.query(data, function(err){
+  if (err) {console.log("error entering data into the database...");}
+  console.log("Data entry successful!");
+});
+
+//connecting server
+server.listen(5001, console.log("server is listening on 5001"));
+
+
+
