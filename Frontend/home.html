@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+  <body>
+
+  <h1>Hello, Welcome To My Page</h1>
+  <h1 id="test">This will change if it works!</h1>
+
+  </body>
+
+
+
+
+
+
+
+  <script>
+
+    //fetching html content from server
+    // fetch("http://localhost:5001/home")
+    //     .then(response => response.text())
+    //     .then(html => console.log(html))
+    //     .catch(error => console.error('Error:', error));
+
+
+    //fetching data from server
+    // fetch("http://localhost:5001/text=1")
+    //     .then(response => response.json())
+    //     .then(data => console.log(data))
+    //     .catch(error => console.error('Error:', error));
+
+
+    //using async/await with fetch
+    async function getHome(){
+      try{
+        const response = await fetch("http://localhost:5001/home");
+        if (response.ok){
+            const text = await response.text();
+            console.log(text);
+            //inserting response into the html dom
+            const element = document.getElementById('test');
+            element.innerHTML = text;
+        } 
+        else{
+            throw new Error('Failed to fetch data');
+        }
+      }
+      catch (error){
+        console.log('Error:', error);
+      }
+    }
+    getHome();
+
+  </script>
+</html>
