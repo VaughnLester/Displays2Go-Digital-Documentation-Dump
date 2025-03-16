@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+  <body>
+
+  <h1>Hello, Welcome To My Page</h1>
+  <h1 id="test">This will change if it works!</h1>
+  <h1 id="text">This will change if it works!</h1>
+  <h1 id="pullData">This will change if it works!</h1>
+
+  <!--Sending form data to database-->
+  <form action = "http://localhost:5001/home">
+    <label for="fname">First name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Last name:</label><br>
+    <input type="text" id="lname" name="lname">
+    <input type="submit" value="Submit">
+  </form>
+
+
+  </body>
+
+
+
+
+
+
+
+  <script>
+
+    //fetching html content from server
+    // fetch("http://localhost:5001/home")
+    //     .then(response => response.text())
+    //     .then(html => console.log(html))
+    //     .catch(error => console.error('Error:', error));
+
+
+    //fetching data from server
+    // fetch("http://localhost:5001/text=1")
+    //     .then(response => response.json())
+    //     .then(data => console.log(data))
+    //     .catch(error => console.error('Error:', error));
+
+
+
+    //using async/await with fetch
+    async function getHome(){
+      try{
+        const response = await fetch("http://localhost:5001/home");
+        if (response.ok){
+            const text = await response.text();
+            console.log(text);
+            //inserting response into the html dom
+            const element = document.getElementById('test');
+            element.innerHTML = text;
+        } 
+        else{
+            throw new Error('Failed to fetch data');
+        }
+      }
+      catch (error){
+        console.log('Error:', error);
+      }
+    }
+    getHome();
+
+    //another fetch request that pulls manually made data:
+    async function getText(){
+      try{
+        const response = await fetch("http://localhost:5001/text");
+        if (response.ok){
+            const text = await response.text();
+            console.log(text);
+            //inserting response into the html dom
+            const element = document.getElementById('text');
+            element.innerHTML = text;
+        } 
+        else{
+            throw new Error('Failed to fetch data');
+        }
+      }
+      catch (error){
+        console.log('Error:', error);
+      }
+    }
+    getText();
+
+
+    //another fetch request, but pulling data from database this time
+    async function getData(){
+      try{
+        const response = await fetch("http://localhost:5001/databasePull");
+        if (response.ok){
+            const text = await response.text();
+            console.log(text);
+            //inserting response into the html dom
+            const element = document.getElementById('pullData');
+            element.innerHTML = text;
+        } 
+        else{
+            throw new Error('Failed to fetch data');
+        }
+      }
+      catch (error){
+        console.log('Error:', error);
+      }
+    }
+   getData();
+
+  </script>
+</html>

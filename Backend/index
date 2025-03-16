@@ -2,12 +2,78 @@
 //here we are creating the server, mysql database connection, and more
 const http = require('http');
 const mysql = require('mysql2');
+const urI = require('url');
 
 
 //creating server
 const server = http.createServer((request, response)=>{
-  response.write("Helllo World!");
-  response.end();
+  //response.write("Helllo World!");
+  //response.end();
+ 
+
+  //creating api endpoint (routes) with url module
+  const url = request.url;
+  //for sending data to database
+  const parsedUrl = urI.parse(request.url, true);
+  console.log("the parsed url: " + JSON.stringify(parsedUrl));
+   if (url == "/home") {
+    response.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin' : '*'});//enables CORS
+     response.write("<h3>Hello From the Backend!<h3>")
+     response.end();
+   }
+   
+   else if (url == "/text") {
+    response.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin' : '*'});//enables CORS
+     response.write("Manual string entered on the backend.")
+     response.end();
+   }
+   //an api route that queries from the database
+   else if (url == "/databasePull"){
+    //to pull correctly, you have to write the response WITHIN the sql query!!! simple!
+    connection.query('SELECT * FROM test.test;', (err,results) =>{
+      if (err){
+        response.writeHead(200, {
+          'Content-Type': 'text/html',
+          'Access-Control-Allow-Origin' : '*'});//enables CORS
+        response.end('error fetching data');
+        return;
+      }
+      response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+      console.log("fetch results: " + JSON.stringify(results))
+      response.end("Database Pull: " + JSON.stringify(results));
+    });
+   } 
+   //sending data from front end (form) to back end database
+   else if (parsedUrl.pathname == "/home"){  //it works becasue the pathname is home when sumbitting the form on the front end!!
+     //use request.on to handle received data
+     let body = '';
+     request.on('data',chunk => {body += chunk.toString();});
+     request.on('end',()=>{
+      //const x = querystring(body);  
+      //inserting the data into the database 
+      const sql = 'INSERT INTO test.test (idtest, text) values(?,?)'
+      connection.query(sql,["4", parsedUrl.href], (err, results) =>{
+        if (err) {console.log("error inserting data into database"); return;}
+        console.log("Data entered successfully into database!");
+      }) 
+      response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+      response.end("data received: " + parsedUrl.href)
+    });
+   } 
+   //if no route is found
+   else 
+   {
+    response.writeHead(404, {'Content-Type': 'text/plain'});
+    response.end('Not one of your designated endpoints! But we are connected!');
+   }
 });
 
 //creating database connection
@@ -33,8 +99,68 @@ connection.query(data, function(err){
   console.log("Data entry successful!");
 });
 
+//inserting more data into database
+var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
+connection.query(data2, function(err){
+  if (err) {console.log("error entering data into the database...");}
+  console.log("Data entry successful!");
+});
+
+//pulling data from backend 
+function pullData(){
+  var x = "";
+  var y = "original value";
+  var z = "";
+  connection.connect(function(err){
+    if(err){console.log("error occurred whilte attempting connection: ", err)}
+    else {console.log("database conncection successful")}
+  })
+  var data = "SELECT text FROM test.test where idtest = 1";
+
+  y =  connection.query(data, (err,results)=>{
+      if (err){return "there was an erro!";}
+      console.log("raw sql pull: " + results);
+      x = JSON.stringify(results);
+      console.log("raw pull stringify: " + x); //prints out correctly
+      y = JSON.parse(x);
+      console.log("raw pull stringify parsed: " + y);
+      console.log(y instanceof Object);
+    })
+    console.log("after the function: " + JSON.stringify(y)); //prints out incorrectly 
+    //x = JSON.stringify(y);
+    //z = JSON.parse(x);
+    return y;
+}
+pullData();
+
+
+//pull data from database and return an array:
+var theData = "";
+function returnData(){ //the problems is it's returning the QUERY itself and not the RESULTS! we need to extract the RESULTS and then stringy it in the response . write on the api 
+  var data = "SELECT text FROM test.test where idtest = 1";
+  var dataArray = "original value";
+ (connection.query(data, (err,results)=>{
+      if (err){return "there was an erro!";}
+      dataArray = results.map(row => Object.values(row));
+      theData = results;
+      return results;
+    }
+  ))
+}
+
+
+console.log("new function" + JSON.stringify(returnData()));
+
 //connecting server
 server.listen(5001, console.log("server is listening on 5001"));
 
 
 
+var wo = 5
+function gg (){
+  wo =7;
+}
+gg();
+console.log(wo);
+
+console.log(JSON.stringify(returnData()));
