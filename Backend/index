@@ -3,6 +3,7 @@
 const http = require('http');
 const mysql = require('mysql2');
 const urI = require('url');
+const fs = require('fs');
 
 
 //creating server
@@ -13,6 +14,7 @@ const server = http.createServer((request, response)=>{
 
   //creating api endpoint (routes) with url module
   const url = request.url;
+
   //for sending data to database
   const parsedUrl = urI.parse(request.url, true);
   console.log("the parsed url: " + JSON.stringify(parsedUrl));
@@ -31,6 +33,7 @@ const server = http.createServer((request, response)=>{
      response.write("Manual string entered on the backend.")
      response.end();
    }
+
    //an api route that queries from the database
    else if (url == "/databasePull"){
     //to pull correctly, you have to write the response WITHIN the sql query!!! simple!
@@ -49,6 +52,7 @@ const server = http.createServer((request, response)=>{
       response.end("Database Pull: " + JSON.stringify(results));
     });
    } 
+
    //sending data from front end (form) to back end database
    else if (parsedUrl.pathname == "/home"){  //it works becasue the pathname is home when sumbitting the form on the front end!!
      //use request.on to handle received data
@@ -68,11 +72,21 @@ const server = http.createServer((request, response)=>{
       response.end("data received: " + parsedUrl.href)
     });
    } 
-   //if no route is found
+
+   //if no route is found - returning your index.html homepage from server!!!
    else 
    {
-    response.writeHead(404, {'Content-Type': 'text/plain'});
-    response.end('Not one of your designated endpoints! But we are connected!');
+    response.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin' : '*'});//enables CORS
+   // fs.createReadStream('index.html').pipe(response);
+    fs.readFile('index.html', function(err, content){
+      if (err){console.log("error occurred trying to send html file"); response.end}
+      else {
+        response.end(content);
+      }
+    })
+    // response.end('Not one of your designated endpoints! But we are connected!');
    }
 });
 
