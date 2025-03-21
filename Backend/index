@@ -37,7 +37,7 @@ const server = http.createServer((request, response)=>{
    //an api route that queries from the database
    else if (url == "/databasePull"){
     //to pull correctly, you have to write the response WITHIN the sql query!!! simple!
-    connection.query('SELECT * FROM test.test;', (err,results) =>{
+    connection.query('SELECT * FROM test;', (err,results) =>{
       if (err){
         response.writeHead(200, {
           'Content-Type': 'text/html',
@@ -61,7 +61,7 @@ const server = http.createServer((request, response)=>{
      request.on('end',()=>{
       //const x = querystring(body);  
       //inserting the data into the database 
-      const sql = 'INSERT INTO test.test (idtest, text) values(?,?)'
+      const sql = 'INSERT INTO test (idtest, text) values(?,?)'
       connection.query(sql,["4", parsedUrl.href], (err, results) =>{
         if (err) {console.log("error inserting data into database"); return;}
         console.log("Data entered successfully into database!");
@@ -92,10 +92,10 @@ const server = http.createServer((request, response)=>{
 
 //creating database connection
 const connection = mysql.createConnection({
-  host:'localhost',
-  user: 'root',
-  password: 'moths63W84fg',
-  database: 'test'
+  host:'sql5.freesqldatabase.com',
+  user: 'sql5768538',
+  password: '9np9VjdEks',
+  database: 'sql5768538'
 });
 
 //connecting database
@@ -129,7 +129,7 @@ function pullData(){
     if(err){console.log("error occurred whilte attempting connection: ", err)}
     else {console.log("database conncection successful")}
   })
-  var data = "SELECT text FROM test.test where idtest = 1";
+  var data = "SELECT text FROM test where idtest = 1";
 
   y =  connection.query(data, (err,results)=>{
       if (err){return "there was an erro!";}
@@ -151,7 +151,7 @@ pullData();
 //pull data from database and return an array:
 var theData = "";
 function returnData(){ //the problems is it's returning the QUERY itself and not the RESULTS! we need to extract the RESULTS and then stringy it in the response . write on the api 
-  var data = "SELECT text FROM test.test where idtest = 1";
+  var data = "SELECT text FROM test where idtest = 1";
   var dataArray = "original value";
  (connection.query(data, (err,results)=>{
       if (err){return "there was an erro!";}
