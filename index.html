@@ -9,7 +9,7 @@
   <h1 id="pullData">This will change if it works!</h1>
 
   <!--Sending form data to database-->
-  <form action = "http://localhost:5001/home">
+  <form action = "http:https://fullstack-website-1-2.onrender.com/home">
     <label for="fname">First name:</label><br>
     <input type="text" id="fname" name="fname"><br>
     <label for="lname">Last name:</label><br>
@@ -49,7 +49,7 @@
     //using async/await with fetch
     async function getHome(){
       try{
-        const response = await fetch("http://localhost:5001/home");
+        const response = await fetch("http:https://fullstack-website-1-2.onrender.com/home");
         if (response.ok){
             const text = await response.text();
             console.log(text);
@@ -70,7 +70,7 @@
     //another fetch request that pulls manually made data:
     async function getText(){
       try{
-        const response = await fetch("http://localhost:5001/text");
+        const response = await fetch("https://fullstack-website-1-2.onrender.com/text");
         if (response.ok){
             const text = await response.text();
             console.log(text);
