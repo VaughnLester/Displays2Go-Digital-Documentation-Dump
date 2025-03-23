@@ -54,7 +54,7 @@ const server = http.createServer((request, response)=>{
    } 
 
    //sending data from front end (form) to back end database
-   else if (parsedUrl.pathname == "/home"){  //it works becasue the pathname is home when sumbitting the form on the front end!!
+   else if (parsedUrl.pathname == "/input"){  //it works becasue the pathname is home when sumbitting the form on the front end!!
      //use request.on to handle received data
      let body = '';
      request.on('data',chunk => {body += chunk.toString();});
