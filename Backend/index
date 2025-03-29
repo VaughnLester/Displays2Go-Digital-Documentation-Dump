@@ -1,85 +1,126 @@
-//index.js is the file the backend run through
-//here we are creating the server, mysql database connection, and more
-const http = require('http');
-const mysql = require('mysql2');
-const urI = require('url');
-const fs = require('fs');
+//Package.json -> Main: index -> Main = Entry point to node program
+
+const http = require('http'); //http module -> used to create server  
+const mysql = require('mysql2'); //mysql module -> used to initiate the mysql database
+const urI = require('url'); //url module -> used to create api endpoints
+const fs = require('fs'); //fs module -> used to read and serve frontend files 
+const querystring = require('node:querystring');//used to parse submitted form data
 
 
-//creating server
+//--------------1. Create Server --------------------
 const server = http.createServer((request, response)=>{
-  //response.write("Helllo World!");
-  //response.end();
- 
 
-  //creating api endpoint (routes) with url module
+  //-------------2. Create API --------------------
   const url = request.url;
-
-  //for sending data to database
-  const parsedUrl = urI.parse(request.url, true);
-  console.log("the parsed url: " + JSON.stringify(parsedUrl));
-   if (url == "/home") {
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin' : '*'});//enables CORS
-     response.write("<h3>Hello From the Backend!<h3>")
-     response.end();
-   }
-   
-   else if (url == "/text") {
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin' : '*'});//enables CORS
-     response.write("Manual string entered on the backend.")
-     response.end();
-   }
-
-   //an api route that queries from the database
-   else if (url == "/databasePull"){
-    //to pull correctly, you have to write the response WITHIN the sql query!!! simple!
-    connection.query('SELECT * FROM test;', (err,results) =>{
-      if (err){
+  const parsedUrl = urI.parse(request.url, true)
+  //ROUTE: /home (responds with text)
+  if (url == "/home") {
+  response.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin' : '*'});//enables CORS
+    response.write("<h3>Hello From the Backend!<h3>")
+    response.end();
+  }
+  //ROUTE: /text (responds with text)
+  else if (url == "/text") {
+  response.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin' : '*'});//enables CORS
+    response.write("Manual string entered on the backend.")
+    response.end();
+  }
+  //ROUTE: /databasePull (responds with database query (SELECT))
+  //SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
+  else if (url == "/databasePull"){
+    connection.query('SELECT * FROM test WHERE idTest = "Jason";', (err,results) =>{ //First create SQL query
+      if (err){ //handle error
         response.writeHead(200, {
           'Content-Type': 'text/html',
           'Access-Control-Allow-Origin' : '*'});//enables CORS
         response.end('error fetching data');
         return;
       }
-      response.writeHead(200, {
+      response.writeHead(200, { //Then respond with SQL query results 
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin' : '*'});//enables CORS
-      console.log("fetch results: " + JSON.stringify(results))
-      response.end("Database Pull: " + JSON.stringify(results));
-    });
-   } 
+      jsonString = JSON.stringify(results);
+      jsonObject = JSON.parse(jsonString);
 
-   //sending data from front end (form) to back end database
-   else if (parsedUrl.pathname == "/input"){  //it works becasue the pathname is home when sumbitting the form on the front end!!
-     //use request.on to handle received data
-     let body = '';
-     request.on('data',chunk => {body += chunk.toString();});
-     request.on('end',()=>{
+      fname = jsonObject[0].idTest;
+      lname = jsonObject[0].text;
+      response.end("Database Pull: " + fname + ' ' + lname);
+    });
+  } 
+  //ROUTE: /input (respondes with databse query (INSERT))
+  //clean this code!
+  else if (parsedUrl.pathname == "/input"){  //The path created on the form -> action attribute + the information you submitted (which is why yo uhave to parse it)
+      //use request.on to handle received data
+
+      //the body remains empty!! so your not pulling data, your pulling just the href!! this needs to be fixed!!
+      let body = '';
+      request.on('data',chunk => {body += chunk.toString();});
+      request.on('end',()=>{
       //const x = querystring(body);  
       //inserting the data into the database 
+      console.log("Parsed: " + body);  
       const sql = 'INSERT INTO test (idtest, text) values(?,?)'
       connection.query(sql,["4", parsedUrl.href], (err, results) =>{
         if (err) {console.log("error inserting data into database"); return;}
         console.log("Data entered successfully into database!");
+        console.log("Data entered: " + parsedUrl.href);
+        //parse form data here to start
+
+
       }) 
       response.writeHead(200, {
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin' : '*'});//enables CORS
       response.end("data received: " + parsedUrl.href)
     });
-   } 
+  } 
 
-   //if no route is found - returning your index.html homepage from server!!!
-   else 
-   {
+
+  //retreiving form data the right way!!
+  else if (request.method === 'POST' && request.url === '/'){
+    let body = '';
+    request.on('data', chunk =>{
+      body += chunk.toString();
+    });
+    request.on('end', ()=>{
+      const parsedData = querystring.parse(body);
+      response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+
+      //parsing data for first and last name
+      const jsonString = JSON.stringify(parsedData);
+      const jsonObject = JSON.parse(jsonString);
+      console.log(jsonObject);
+      const fname = jsonObject.fname;
+      const lname = jsonObject.lname;
+      
+
+      //inserting first and last name into databse 
+      const sql = 'INSERT INTO test (idtest, text) values(?,?)'
+      connection.query(sql,[fname, lname], (err, results) =>{
+        if (err) {console.log("error inserting data into database "+ err); return;}
+        else {
+          console.log("Database entry successful: " + fname + ' ' + lname);}
+      })
+
+
+
+      response.end(`Received data: ${JSON.stringify(parsedData)}`);
+    })
+  }
+
+    //if no route is found - returning your index.html homepage from server!!!
+    else 
+    {
     response.writeHead(200, {
       'Content-Type': 'text/html',
       'Access-Control-Allow-Origin' : '*'});//enables CORS
-   // fs.createReadStream('index.html').pipe(response);
+    // fs.createReadStream('index.html').pipe(response);
     fs.readFile('index.html', function(err, content){
       if (err){console.log("error occurred trying to send html file"); response.end}
       else {
@@ -87,8 +128,9 @@ const server = http.createServer((request, response)=>{
       }
     })
     // response.end('Not one of your designated endpoints! But we are connected!');
-   }
-});
+    }
+  }
+);
 
 //creating database connection
 const connection = mysql.createConnection({

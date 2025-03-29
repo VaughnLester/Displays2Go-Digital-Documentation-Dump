@@ -11,7 +11,7 @@
   <h1 id="pullData">This will change if it works!</h1>
 
   <!--Sending form data to database-->
-  <form action = "/input">
+  <form id="form" >
     <label for="fname">First name:</label><br>
     <input type="text" id="fname" name="fname"><br>
     <label for="lname">Last name:</label><br>
@@ -111,6 +111,27 @@
       }
     }
    getData();
+
+   const form = document.getElementById('form');  
+    
+   form.addEventListener('submit', async (event)=> {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+
+    const response = await fetch ('/', {
+      method: 'POST',
+      body: new URLSearchParams(formData),
+      fname: formData.get('fname'),
+      lname: formData.get('lname'),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+
+    const data = await response.text();
+    alert(data);
+   })
 
   </script>
 </html>
