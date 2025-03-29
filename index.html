@@ -11,7 +11,7 @@
   <h1 id="pullData">This will change if it works!</h1>
 
   <!--Sending form data to database-->
-  <form id="form" >
+  <form id="form" action="/confirmation">
     <label for="fname">First name:</label><br>
     <input type="text" id="fname" name="fname"><br>
     <label for="lname">Last name:</label><br>
@@ -112,25 +112,24 @@
     }
    getData();
 
+   //sending the form data HERE instead of in the FORM in order to access the FormData values
    const form = document.getElementById('form');  
     
    form.addEventListener('submit', async (event)=> {
-    event.preventDefault();
+    //event.preventDefault();
 
     const formData = new FormData(form);
 
-    const response = await fetch ('/', {
-      method: 'POST',
+    const response = await fetch ('/', {  //uses await just like the other fetch functions
+      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself
       body: new URLSearchParams(formData),
-      fname: formData.get('fname'),
-      lname: formData.get('lname'),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     })
 
     const data = await response.text();
-    alert(data);
+    //alert(data);
    })
 
   </script>

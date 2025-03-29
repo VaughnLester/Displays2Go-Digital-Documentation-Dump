@@ -32,7 +32,7 @@ const server = http.createServer((request, response)=>{
   //ROUTE: /databasePull (responds with database query (SELECT))
   //SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
   else if (url == "/databasePull"){
-    connection.query('SELECT * FROM test WHERE idTest = "Jason";', (err,results) =>{ //First create SQL query
+    connection.query('SELECT * FROM test;', (err,results) =>{ //First create SQL query
       if (err){ //handle error
         response.writeHead(200, {
           'Content-Type': 'text/html',
@@ -45,10 +45,22 @@ const server = http.createServer((request, response)=>{
         'Access-Control-Allow-Origin' : '*'});//enables CORS
       jsonString = JSON.stringify(results);
       jsonObject = JSON.parse(jsonString);
+      console.log(jsonObject.length);
 
       fname = jsonObject[0].idTest;
       lname = jsonObject[0].text;
-      response.end("Database Pull: " + fname + ' ' + lname);
+
+      //grab data from each row in database
+      function readRows(arr){
+        let max = arr.length -1;
+        let results = ' ';
+        while (max > -1){
+          results += `${arr[max].idTest} ${arr[max].text}, `
+          max--;
+        }
+        return results;
+      }
+      response.end("Database Pull: " + readRows(jsonObject));
     });
   } 
   //ROUTE: /input (respondes with databse query (INSERT))
@@ -64,6 +76,7 @@ const server = http.createServer((request, response)=>{
       //inserting the data into the database 
       console.log("Parsed: " + body);  
       const sql = 'INSERT INTO test (idtest, text) values(?,?)'
+      //here, your putting in the entire href (end of url)
       connection.query(sql,["4", parsedUrl.href], (err, results) =>{
         if (err) {console.log("error inserting data into database"); return;}
         console.log("Data entered successfully into database!");
@@ -83,19 +96,19 @@ const server = http.createServer((request, response)=>{
   //retreiving form data the right way!!
   else if (request.method === 'POST' && request.url === '/'){
     let body = '';
-    request.on('data', chunk =>{
+    request.on('data', chunk =>{ //chunk is the end of the url
       body += chunk.toString();
     });
     request.on('end', ()=>{
-      const parsedData = querystring.parse(body);
+      const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
       response.writeHead(200, {  
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin' : '*'});//enables CORS
 
-      //parsing data for first and last name
+      //grabbing first and last name from the parsed url
       const jsonString = JSON.stringify(parsedData);
       const jsonObject = JSON.parse(jsonString);
-      console.log(jsonObject);
+
       const fname = jsonObject.fname;
       const lname = jsonObject.lname;
       
@@ -107,10 +120,22 @@ const server = http.createServer((request, response)=>{
         else {
           console.log("Database entry successful: " + fname + ' ' + lname);}
       })
-
-
-
       response.end(`Received data: ${JSON.stringify(parsedData)}`);
+    })
+  }
+
+  else if (parsedUrl.pathname == "/confirmation"){
+    response.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin' : '*'});//enables CORS
+    fs.readFile('confirmation.html', function(err,content){
+      if(err){
+        console.log(err);
+        response.end;
+      }
+      else{
+        response.end(content);
+      }
     })
   }
 
@@ -148,19 +173,22 @@ connection.connect(function(err)
   }
 );
 
-//inserting data into database
-var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
-connection.query(data, function(err){
-  if (err) {console.log("error entering data into the database...");}
-  console.log("Data entry successful!");
-});
+function insertData(){
+  //inserting data into database
+  var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
+  connection.query(data, function(err){
+    if (err) {console.log("error entering data into the database...");}
+    console.log("Data entry successful!");
+  });
 
-//inserting more data into database
-var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
-connection.query(data2, function(err){
-  if (err) {console.log("error entering data into the database...");}
-  console.log("Data entry successful!");
-});
+  //inserting more data into database
+
+  var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
+  connection.query(data2, function(err){
+    if (err) {console.log("error entering data into the database...");}
+    console.log("Data entry successful!");
+  });
+}
 
 //pulling data from backend 
 function pullData(){
@@ -187,7 +215,7 @@ function pullData(){
     //z = JSON.parse(x);
     return y;
 }
-pullData();
+//pullData();
 
 
 //pull data from database and return an array:
