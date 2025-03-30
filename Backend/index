@@ -29,6 +29,7 @@ const server = http.createServer((request, response)=>{
     response.write("Manual string entered on the backend.")
     response.end();
   }
+  //GET
   //ROUTE: /databasePull (responds with database query (SELECT))
   //SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
   else if (url == "/databasePull"){
@@ -60,7 +61,9 @@ const server = http.createServer((request, response)=>{
         }
         return results;
       }
-      response.end("Database Pull: " + readRows(jsonObject));
+      response.write(readRows(jsonObject));
+      response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
+      response.end();
     });
   } 
   //ROUTE: /input (respondes with databse query (INSERT))
@@ -92,9 +95,10 @@ const server = http.createServer((request, response)=>{
     });
   } 
 
-
+  //POST
   //retreiving form data the right way!!
   else if (request.method === 'POST' && request.url === '/'){
+    console.log('create path found');
     let body = '';
     request.on('data', chunk =>{ //chunk is the end of the url
       body += chunk.toString();
@@ -124,6 +128,72 @@ const server = http.createServer((request, response)=>{
     })
   }
 
+  //PUT
+  else if (request.method === 'PUT' && request.url === '/'){
+    console.log('update path found');
+    let body = '';
+    request.on('data', chunk =>{ //chunk is the end of the url
+      body += chunk.toString();
+    });
+    request.on('end', ()=>{
+      const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+      response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+
+      //grabbing first and last name from the parsed url
+      const jsonString = JSON.stringify(parsedData);
+      const jsonObject = JSON.parse(jsonString);
+
+      const fname = jsonObject.fname;
+      const lname = jsonObject.lname;
+      
+
+      //inserting first and last name into databse 
+      const sql = 'UPDATE test SET text = ? WHERE idtest = ?;'
+      connection.query(sql,[lname, fname], (err, results) =>{
+        if (err) {console.log("error inserting data into database "+ err); return;}
+        else {
+          console.log("Database update successful: " + fname + ' ' + lname);}
+      })
+      response.end(`Received data: ${JSON.stringify(parsedData)}`);
+    })
+  }
+
+
+    //DELETE
+    else if (request.method === 'DELETE' && request.url === '/'){
+      console.log('delete path found');
+      let body = '';
+      request.on('data', chunk =>{ //chunk is the end of the url
+        body += chunk.toString();
+      });
+      request.on('end', ()=>{
+        const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+        response.writeHead(200, {  
+          'Content-Type': 'text/html',
+          'Access-Control-Allow-Origin' : '*'});//enables CORS
+  
+        //grabbing first and last name from the parsed url
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+  
+        const fname = jsonObject.fname;
+        
+        //inserting first and last name into databse 
+        const sql = 'DELETE FROM test WHERE idtest = ?;'
+        connection.query(sql,[fname], (err, results) =>{
+          if (err) {console.log("error inserting data into database "+ err); return;}
+          else {
+            console.log("Database delete successful: " + fname + " deleted");}
+        })
+        response.end(`Received data: ${JSON.stringify(parsedData)}`);
+      })
+    }
+  
+
+
+  //form submit confirmation
   else if (parsedUrl.pathname == "/confirmation"){
     response.writeHead(200, {
       'Content-Type': 'text/html',

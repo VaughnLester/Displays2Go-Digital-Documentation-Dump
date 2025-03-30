@@ -3,7 +3,7 @@
 
   <body>
 
-  <h1>Hello, Welcome To My Page</h1><br><br>
+  <h1>Hello, Welcome To My Page</h1><br>
 
   <h1><u>Example Fetch Data</u></h1>
   <h1 id="test">This will change if it works!</h1>
@@ -11,6 +11,7 @@
   <h1 id="pullData">This will change if it works!</h1>
 
   <!--Sending form data to database-->
+  <h3>Create (POST)</h3>
   <form id="form" action="/confirmation">
     <label for="fname">First name:</label><br>
     <input type="text" id="fname" name="fname"><br>
@@ -18,10 +19,27 @@
     <input type="text" id="lname" name="lname">
     <input type="submit" value="Submit">
   </form>
-  My API created in the server:<br>
+
+  <h3>Read (GET)</h3>
   <a href="/databasePull">/databasePull</a><br>
   <a href="/home">/home</a><br>
   <a href="/text">/text</a><br>
+
+  <h3>Update (PUT)</h3>
+  <form id="form2" action="/confirmation">
+    <label for="fname">First name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Change Last Name To:</label><br>
+    <input type="text" id="lname" name="lname">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Delete (DELETE)</h3>
+  <form id="form3" action="/confirmation">
+    <label for="fname">Enter First Name - Delete Name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <input type="submit" value="Submit">
+  </form>
 
   </body>
 
@@ -91,6 +109,7 @@
     getText();
 
 
+    //READ
     //another fetch request, but pulling data from database this time
     async function getData(){
       try{
@@ -112,6 +131,7 @@
     }
    getData();
 
+   //CREATE 
    //sending the form data HERE instead of in the FORM in order to access the FormData values
    const form = document.getElementById('form');  
     
@@ -121,16 +141,39 @@
     const formData = new FormData(form);
 
     const response = await fetch ('/', {  //uses await just like the other fetch functions
-      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself
-      body: new URLSearchParams(formData),
+      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
+      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
       }
     })
-
-    const data = await response.text();
+    //const data = await response.text();
     //alert(data);
    })
+
+   //PUT
+   const form2 = document.getElementById('form2');
+   form2.addEventListener('submit', async (event) =>{
+    const formData2 = new FormData(form2);
+    const response2 = fetch ('/', {
+      method: 'PUT',
+      body: new URLSearchParams(formData2),
+      headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
+    })
+   })
+
+   //DELETE
+   const form3 = document.getElementById('form3');
+   form3.addEventListener('submit', async (event) =>{
+    const formData = new FormData(form3);
+    const response = fetch ('/', {
+      method: 'DELETE',
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
+    })
+   })
+
+
 
   </script>
 </html>
