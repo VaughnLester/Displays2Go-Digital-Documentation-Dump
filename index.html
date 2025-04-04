@@ -20,6 +20,26 @@
     <input type="submit" value="Submit">
   </form>
 
+  <h3>Create new SKU(POST)</h3>
+  <form id="formSKU" action="/confirmation">
+    <label for="fname">New SKU:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <!--Add to existing SKU:-->
+  <h3>Add Data</h3>
+  <form id="formAdd" action="/confirmation">
+    <label for="fname">SKU:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Data Title:</label><br>
+    <input type="text" id="lname" name="lname"><br>
+    <label for="lname2">New Entry:</label><br>
+    <input type="text" id="lname2" name="lname2"><br>
+    <input type="submit" value="Submit">
+  </form>
+
+
   <h3>Read (GET)</h3>
   <a href="/databasePull">/databasePull</a><br>
   <a href="/home">/home</a><br>
@@ -113,7 +133,11 @@
     //another fetch request, but pulling data from database this time
     async function getData(){
       try{
-        const response = await fetch("/databasePull");
+        const response = await fetch("/databasePull", {
+            method: 'GET',
+            body: new URLSearchParams(formData2),
+            headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
+            });
         if (response.ok){
             const text = await response.text();
             console.log(text);
@@ -173,7 +197,45 @@
     })
    })
 
+   //CREATE - new SKU table
+   //sending the form data HERE instead of in the FORM in order to access the FormData values
+   const formSKU = document.getElementById('formSKU');  
+    
+   formSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
 
+    const formData = new FormData(formSKU);
+
+    const response = await fetch ('/newSKU', {  //uses await just like the other fetch functions
+      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
+      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+      }
+    })
+    //const data = await response.text();
+    //alert(data);
+   })
+
+
+    //CREATE - add data to existing SKU
+   //sending the form data HERE instead of in the FORM in order to access the FormData values
+   const formAdd = document.getElementById('formAdd');  
+    
+   formAdd.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+
+    const formData = new FormData(formAdd);
+
+    const response = await fetch ('/skuAdd', {  //uses await just like the other fetch functions
+      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
+      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+      }
+    })
+    //const data = await response.text();
+   })
 
   </script>
 </html>

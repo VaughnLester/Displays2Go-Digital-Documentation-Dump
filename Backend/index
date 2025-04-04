@@ -1,5 +1,4 @@
-//Package.json -> Main: index -> Main = Entry point to node program
-
+//Entry point for the application (see package.json, main attribute)
 const http = require('http'); //http module -> used to create server  
 const mysql = require('mysql2'); //mysql module -> used to initiate the mysql database
 const urI = require('url'); //url module -> used to create api endpoints
@@ -7,283 +6,376 @@ const fs = require('fs'); //fs module -> used to read and serve frontend files
 const querystring = require('node:querystring');//used to parse submitted form data
 
 
-//--------------1. Create Server --------------------
+//SERVER
 const server = http.createServer((request, response)=>{
+const url = request.url;
+const method = request.method;
+const parsedUrl = urI.parse(request.url, true)
 
-  //-------------2. Create API --------------------
-  const url = request.url;
-  const parsedUrl = urI.parse(request.url, true)
-  //ROUTE: /home (responds with text)
-  if (url == "/home") {
-  response.writeHead(200, {
-    'Content-Type': 'text/html',
-    'Access-Control-Allow-Origin' : '*'});//enables CORS
-    response.write("<h3>Hello From the Backend!<h3>")
-    response.end();
-  }
-  //ROUTE: /text (responds with text)
-  else if (url == "/text") {
-  response.writeHead(200, {
-    'Content-Type': 'text/html',
-    'Access-Control-Allow-Origin' : '*'});//enables CORS
-    response.write("Manual string entered on the backend.")
-    response.end();
-  }
-  //GET
-  //ROUTE: /databasePull (responds with database query (SELECT))
-  //SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
-  else if (url == "/databasePull"){
-    connection.query('SELECT * FROM test;', (err,results) =>{ //First create SQL query
-      if (err){ //handle error
-        response.writeHead(200, {
-          'Content-Type': 'text/html',
-          'Access-Control-Allow-Origin' : '*'});//enables CORS
-        response.end('error fetching data');
-        return;
-      }
-      response.writeHead(200, { //Then respond with SQL query results 
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-      jsonString = JSON.stringify(results);
-      jsonObject = JSON.parse(jsonString);
-      console.log(jsonObject.length);
-
-      fname = jsonObject[0].idTest;
-      lname = jsonObject[0].text;
-
-      //grab data from each row in database
-      function readRows(arr){
-        let max = arr.length -1;
-        let results = ' ';
-        while (max > -1){
-          results += `${arr[max].idTest} ${arr[max].text}, `
-          max--;
-        }
-        return results;
-      }
-      response.write(readRows(jsonObject));
-      response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
-      response.end();
-    });
-  } 
-  //ROUTE: /input (respondes with databse query (INSERT))
-  //clean this code!
-  else if (parsedUrl.pathname == "/input"){  //The path created on the form -> action attribute + the information you submitted (which is why yo uhave to parse it)
-      //use request.on to handle received data
-
-      //the body remains empty!! so your not pulling data, your pulling just the href!! this needs to be fixed!!
-      let body = '';
-      request.on('data',chunk => {body += chunk.toString();});
-      request.on('end',()=>{
-      //const x = querystring(body);  
-      //inserting the data into the database 
-      console.log("Parsed: " + body);  
-      const sql = 'INSERT INTO test (idtest, text) values(?,?)'
-      //here, your putting in the entire href (end of url)
-      connection.query(sql,["4", parsedUrl.href], (err, results) =>{
-        if (err) {console.log("error inserting data into database"); return;}
-        console.log("Data entered successfully into database!");
-        console.log("Data entered: " + parsedUrl.href);
-        //parse form data here to start
-
-
-      }) 
-      response.writeHead(200, {
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-      response.end("data received: " + parsedUrl.href)
-    });
-  } 
-
-  //POST
-  //retreiving form data the right way!!
-  else if (request.method === 'POST' && request.url === '/'){
-    console.log('create path found');
-    let body = '';
-    request.on('data', chunk =>{ //chunk is the end of the url
-      body += chunk.toString();
-    });
-    request.on('end', ()=>{
-      const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-      response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-
-      //grabbing first and last name from the parsed url
-      const jsonString = JSON.stringify(parsedData);
-      const jsonObject = JSON.parse(jsonString);
-
-      const fname = jsonObject.fname;
-      const lname = jsonObject.lname;
-      
-
-      //inserting first and last name into databse 
-      const sql = 'INSERT INTO test (idtest, text) values(?,?)'
-      connection.query(sql,[fname, lname], (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-          console.log("Database entry successful: " + fname + ' ' + lname);}
-      })
-      response.end(`Received data: ${JSON.stringify(parsedData)}`);
-    })
-  }
-
-  //PUT
-  else if (request.method === 'PUT' && request.url === '/'){
-    console.log('update path found');
-    let body = '';
-    request.on('data', chunk =>{ //chunk is the end of the url
-      body += chunk.toString();
-    });
-    request.on('end', ()=>{
-      const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-      response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-
-      //grabbing first and last name from the parsed url
-      const jsonString = JSON.stringify(parsedData);
-      const jsonObject = JSON.parse(jsonString);
-
-      const fname = jsonObject.fname;
-      const lname = jsonObject.lname;
-      
-
-      //inserting first and last name into databse 
-      const sql = 'UPDATE test SET text = ? WHERE idtest = ?;'
-      connection.query(sql,[lname, fname], (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-          console.log("Database update successful: " + fname + ' ' + lname);}
-      })
-      response.end(`Received data: ${JSON.stringify(parsedData)}`);
-    })
-  }
-
-
-    //DELETE
-    else if (request.method === 'DELETE' && request.url === '/'){
-      console.log('delete path found');
-      let body = '';
-      request.on('data', chunk =>{ //chunk is the end of the url
+//ENDPOINTS   
+//this needs to pull the idtest only, then you should be able to click the idtest to bring you to a page that displays all text that was added for it 
+switch (`${url}, ${method}`){
+    case '/databasePull, GET':
+        //revise this:
+        //pull ALL tables - each TABLE should be a link to all of that TABLE's ENTRIES!
+        connection.query('SELECT * FROM test;', (err,results) =>{ //First create SQL query
+            if (err){ //handle error
+                response.writeHead(200, {
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin' : '*'});//enables CORS
+                response.end('error fetching data');
+                return;
+            }
+            response.writeHead(200, { //Then respond with SQL query results 
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});//enables CORS
+            jsonString = JSON.stringify(results);
+            jsonObject = JSON.parse(jsonString);
+            response.write(readRows(jsonObject));
+            response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
+            response.end();
+        });
+        break;
+    //create new SKU table
+    case '/newSKU, POST':
+        let body = '';
+        request.on('data', chunk =>{ //chunk is the end of the url
         body += chunk.toString();
-      });
-      request.on('end', ()=>{
+        });
+        request.on('end', ()=>{
         const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        response.writeHead(200, {  
-          'Content-Type': 'text/html',
-          'Access-Control-Allow-Origin' : '*'});//enables CORS
-  
+        // response.writeHead(200, {  
+        // 'Content-Type': 'text/html',
+        // 'Access-Control-Allow-Origin' : '*'});//enables CORS
+        
         //grabbing first and last name from the parsed url
         const jsonString = JSON.stringify(parsedData);
         const jsonObject = JSON.parse(jsonString);
-  
-        const fname = jsonObject.fname;
         
+        const fname = jsonObject.fname;
+        const lname = jsonObject.lname;
+        
+        console.log("new table about to create");
         //inserting first and last name into databse 
-        const sql = 'DELETE FROM test WHERE idtest = ?;'
-        connection.query(sql,[fname], (err, results) =>{
-          if (err) {console.log("error inserting data into database "+ err); return;}
-          else {
-            console.log("Database delete successful: " + fname + " deleted");}
+        connection.query(`CREATE TABLE ${fname} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, PRIMARY KEY (entryID));`, (err, results) =>{
+        if (err) {console.log("error inserting data into database "+ err); return;}
+        else {
+        console.log("Database table creation successful: " + fname + ' ' + lname);}
         })
         response.end(`Received data: ${JSON.stringify(parsedData)}`);
-      })
+        });
+        break;
+    //add data to existing SKU
+    case '/skuAdd, POST':
+        let body2 = '';
+        request.on('data', chunk =>{ //chunk is the end of the url
+        body2 += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(body2); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+        // response.writeHead(200, {  
+        // 'Content-Type': 'text/html',
+        // 'Access-Control-Allow-Origin' : '*'});//enables CORS
+        
+        //grabbing first and last name from the parsed url
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        
+        const fname = jsonObject.fname;
+        const lname = jsonObject.lname;
+        const lname2 = jsonObject.lname2;
+        
+        //inserting first and last name into databse 
+        connection.query(`INSERT INTO ${fname} (Title, Entry) VALUES ("${lname}", "${lname2}")`, (err, results) =>{
+        if (err) {console.log("error inserting data into database "+ err); return;}
+        else {
+        console.log("Database table update successful: " + fname + ' ' + lname);}
+        })
+        response.end(`Received data: ${JSON.stringify(parsedData)}`);
+        });
+        break;
+}
+
+
+
+//function :
+//grab data from each row in database
+function readRows(arr){
+    let max = arr.length -1;
+    let results = ' ';
+    while (max > -1){
+    results += `${arr[max].idTest} ${arr[max].text}, `
+    max--;
     }
-  
+    return results;
+}
 
 
-  //form submit confirmation
-  else if (parsedUrl.pathname == "/confirmation"){
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin' : '*'});//enables CORS
-    fs.readFile('confirmation.html', function(err,content){
-      if(err){
-        console.log(err);
-        response.end;
-      }
-      else{
-        response.end(content);
-      }
-    })
-  }
 
-    //if no route is found - returning your index.html homepage from server!!!
-    else 
-    {
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin' : '*'});//enables CORS
-    // fs.createReadStream('index.html').pipe(response);
-    fs.readFile('index.html', function(err, content){
-      if (err){console.log("error occurred trying to send html file"); response.end}
-      else {
-        response.end(content);
-      }
-    })
-    // response.end('Not one of your designated endpoints! But we are connected!');
-    }
-  }
+
+
+if (url == "/home") { //home (GET)
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+response.write("<h3>Hello From the Backend!<h3>")
+response.end();
+}
+//ROUTE: /text (responds with text)
+else if (url == "/text") {
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+response.write("Manual string entered on the backend.")
+response.end();
+}
+//GET
+//ROUTE: /databasePull (responds with database query (SELECT))
+//SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
+else if (url == "/databasePull"){
+connection.query('SELECT * FROM test;', (err,results) =>{ //First create SQL query
+if (err){ //handle error
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+response.end('error fetching data');
+return;
+}
+response.writeHead(200, { //Then respond with SQL query results 
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+jsonString = JSON.stringify(results);
+jsonObject = JSON.parse(jsonString);
+console.log(jsonObject.length);
+
+fname = jsonObject[0].idTest;
+lname = jsonObject[0].text;
+
+
+
+response.write(readRows(jsonObject));
+response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
+response.end();
+});
+} 
+//ROUTE: /input (respondes with databse query (INSERT))
+//clean this code!
+else if (parsedUrl.pathname == "/input"){  //The path created on the form -> action attribute + the information you submitted (which is why yo uhave to parse it)
+//use request.on to handle received data
+
+//the body remains empty!! so your not pulling data, your pulling just the href!! this needs to be fixed!!
+let body = '';
+request.on('data',chunk => {body += chunk.toString();});
+request.on('end',()=>{
+//const x = querystring(body);  
+//inserting the data into the database 
+console.log("Parsed: " + body);  
+const sql = 'INSERT INTO test (idtest, text) values(?,?)'
+//here, your putting in the entire href (end of url)
+connection.query(sql,["4", parsedUrl.href], (err, results) =>{
+if (err) {console.log("error inserting data into database"); return;}
+console.log("Data entered successfully into database!");
+console.log("Data entered: " + parsedUrl.href);
+//parse form data here to start
+
+
+}) 
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+response.end("data received: " + parsedUrl.href)
+});
+} 
+
+//POST
+//retreiving form data the right way!!
+else if (request.method === 'POST' && request.url === '/'){
+console.log('create path found');
+let body = '';
+request.on('data', chunk =>{ //chunk is the end of the url
+body += chunk.toString();
+});
+request.on('end', ()=>{
+const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+response.writeHead(200, {  
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+
+//grabbing first and last name from the parsed url
+const jsonString = JSON.stringify(parsedData);
+const jsonObject = JSON.parse(jsonString);
+
+const fname = jsonObject.fname;
+const lname = jsonObject.lname;
+
+
+//inserting first and last name into databse 
+const sql = 'INSERT INTO test (idtest, text) values(?,?)'
+connection.query(sql,[fname, lname], (err, results) =>{
+if (err) {console.log("error inserting data into database "+ err); return;}
+else {
+console.log("Database entry successful: " + fname + ' ' + lname);}
+})
+response.end(`Received data: ${JSON.stringify(parsedData)}`);
+})
+}
+
+//PUT
+else if (request.method === 'PUT' && request.url === '/'){
+console.log('update path found');
+let body = '';
+request.on('data', chunk =>{ //chunk is the end of the url
+body += chunk.toString();
+});
+request.on('end', ()=>{
+const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+response.writeHead(200, {  
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+
+//grabbing first and last name from the parsed url
+const jsonString = JSON.stringify(parsedData);
+const jsonObject = JSON.parse(jsonString);
+
+const fname = jsonObject.fname;
+const lname = jsonObject.lname;
+
+
+//inserting first and last name into databse 
+const sql = 'UPDATE test SET text = ? WHERE idtest = ?;'
+connection.query(sql,[lname, fname], (err, results) =>{
+if (err) {console.log("error inserting data into database "+ err); return;}
+else {
+console.log("Database update successful: " + fname + ' ' + lname);}
+})
+response.end(`Received data: ${JSON.stringify(parsedData)}`);
+})
+}
+
+
+//DELETE
+else if (request.method === 'DELETE' && request.url === '/'){
+console.log('delete path found');
+let body = '';
+request.on('data', chunk =>{ //chunk is the end of the url
+body += chunk.toString();
+});
+request.on('end', ()=>{
+const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+response.writeHead(200, {  
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+
+//grabbing first and last name from the parsed url
+const jsonString = JSON.stringify(parsedData);
+const jsonObject = JSON.parse(jsonString);
+
+const fname = jsonObject.fname;
+
+//inserting first and last name into databse 
+const sql = 'DELETE FROM test WHERE idtest = ?;'
+connection.query(sql,[fname], (err, results) =>{
+if (err) {console.log("error inserting data into database "+ err); return;}
+else {
+console.log("Database delete successful: " + fname + " deleted");}
+})
+response.end(`Received data: ${JSON.stringify(parsedData)}`);
+})
+}
+
+
+
+//form submit confirmation
+else if (parsedUrl.pathname == "/confirmation"){
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+fs.readFile('confirmation.html', function(err,content){
+if(err){
+console.log(err);
+response.end;
+}
+else{
+response.end(content);
+}
+})
+}
+
+//if no route is found - returning your index.html homepage from server!!!
+else 
+{
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+// fs.createReadStream('index.html').pipe(response);
+fs.readFile('index.html', function(err, content){
+if (err){console.log("error occurred trying to send html file"); response.end}
+else {
+response.end(content);
+}
+})
+// response.end('Not one of your designated endpoints! But we are connected!');
+}
+}
 );
 
 //creating database connection
 const connection = mysql.createConnection({
-  host:'sql5.freesqldatabase.com',
-  user: 'sql5768538',
-  password: '9np9VjdEks',
-  database: 'sql5768538'
+host:'sql5.freesqldatabase.com',
+user: 'sql5768538',
+password: '9np9VjdEks',
+database: 'sql5768538'
 });
 
 //connecting database
 connection.connect(function(err)
-  {
-    if (err){console.log("error occurred while attempting connection: ", err)}
-    else {console.log("database connection successful!")}
-  }
+{
+if (err){console.log("error occurred while attempting connection: ", err)}
+else {console.log("database connection successful!")}
+}
 );
 
 function insertData(){
-  //inserting data into database
-  var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
-  connection.query(data, function(err){
-    if (err) {console.log("error entering data into the database...");}
-    console.log("Data entry successful!");
-  });
+//inserting data into database
+var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
+connection.query(data, function(err){
+if (err) {console.log("error entering data into the database...");}
+console.log("Data entry successful!");
+});
 
-  //inserting more data into database
+//inserting more data into database
 
-  var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
-  connection.query(data2, function(err){
-    if (err) {console.log("error entering data into the database...");}
-    console.log("Data entry successful!");
-  });
+var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
+connection.query(data2, function(err){
+if (err) {console.log("error entering data into the database...");}
+console.log("Data entry successful!");
+});
 }
 
 //pulling data from backend 
 function pullData(){
-  var x = "";
-  var y = "original value";
-  var z = "";
-  connection.connect(function(err){
-    if(err){console.log("error occurred whilte attempting connection: ", err)}
-    else {console.log("database conncection successful")}
-  })
-  var data = "SELECT text FROM test where idtest = 1";
+var x = "";
+var y = "original value";
+var z = "";
+connection.connect(function(err){
+if(err){console.log("error occurred whilte attempting connection: ", err)}
+else {console.log("database conncection successful")}
+})
+var data = "SELECT text FROM test where idtest = 1";
 
-  y =  connection.query(data, (err,results)=>{
-      if (err){return "there was an erro!";}
-      console.log("raw sql pull: " + results);
-      x = JSON.stringify(results);
-      console.log("raw pull stringify: " + x); //prints out correctly
-      y = JSON.parse(x);
-      console.log("raw pull stringify parsed: " + y);
-      console.log(y instanceof Object);
-    })
-    console.log("after the function: " + JSON.stringify(y)); //prints out incorrectly 
-    //x = JSON.stringify(y);
-    //z = JSON.parse(x);
-    return y;
+y =  connection.query(data, (err,results)=>{
+if (err){return "there was an erro!";}
+console.log("raw sql pull: " + results);
+x = JSON.stringify(results);
+console.log("raw pull stringify: " + x); //prints out correctly
+y = JSON.parse(x);
+console.log("raw pull stringify parsed: " + y);
+console.log(y instanceof Object);
+})
+console.log("after the function: " + JSON.stringify(y)); //prints out incorrectly 
+//x = JSON.stringify(y);
+//z = JSON.parse(x);
+return y;
 }
 //pullData();
 
@@ -291,15 +383,15 @@ function pullData(){
 //pull data from database and return an array:
 var theData = "";
 function returnData(){ //the problems is it's returning the QUERY itself and not the RESULTS! we need to extract the RESULTS and then stringy it in the response . write on the api 
-  var data = "SELECT text FROM test where idtest = 1";
-  var dataArray = "original value";
- (connection.query(data, (err,results)=>{
-      if (err){return "there was an erro!";}
-      dataArray = results.map(row => Object.values(row));
-      theData = results;
-      return results;
-    }
-  ))
+var data = "SELECT text FROM test where idtest = 1";
+var dataArray = "original value";
+(connection.query(data, (err,results)=>{
+if (err){return "there was an erro!";}
+dataArray = results.map(row => Object.values(row));
+theData = results;
+return results;
+}
+))
 }
 
 
@@ -312,7 +404,7 @@ server.listen(5001, console.log("server is listening on 5001"));
 
 var wo = 5
 function gg (){
-  wo =7;
+wo =7;
 }
 gg();
 console.log(wo);
