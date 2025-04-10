@@ -28,6 +28,13 @@
     <input type="submit" value="Submit">
   </form>
 
+  <h3>Delete SKU</h3> SKU(POST)</h3>
+  <form id="formDelete" action="/confirmation">
+    <label for="SKU">Delete SKU:</label><br>
+    <input type="text" id="SKU" name="SKU"><br>
+    <input type="submit" value="Submit">
+  </form>
+
   <!--Add to existing SKU:-->
   <h3>Add Data</h3>
   <form id="formAdd" action="/confirmation">
@@ -241,6 +248,25 @@
     })
     //const data = await response.text();
    })
+
+
+   //DELETE SKU
+   const formDelete = document.getElementById('formDelete');  
+    
+    formDelete.addEventListener('submit', async (event)=> {
+     //event.preventDefault();
+ 
+     const formData = new FormData(formDelete);
+ 
+     const response = await fetch ('/skuDelete', {  //uses await just like the other fetch functions
+       method: 'DELETE', 
+       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+       headers: {
+         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+       }
+     })
+     //const data = await response.text();
+    })
 
   </script>
 </html>
