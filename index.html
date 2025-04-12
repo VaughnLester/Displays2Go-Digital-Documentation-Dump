@@ -35,6 +35,16 @@
     <input type="submit" value="Submit">
   </form>
 
+  <!--Change Existing SKU-->
+  <h3>Change SKU</h3> SKU(POST)</h3>
+  <form id="formChangeSKU" action="/confirmation">
+    <label for="SKU">Change SKU:</label><br>
+    <input type="text" id="SKU" name="SKU"><br>
+    <label for="newSKU">New SKU Name:</label><br>
+    <input type="text" id="newSKU" name="newSKU"><br><!--Name determines what is sent in the url!-->
+    <input type="submit" value="Submit">
+  </form>
+
   <!--Add to existing SKU:-->
   <h3>Add Data</h3>
   <form id="formAdd" action="/confirmation">
@@ -46,6 +56,19 @@
     <input type="text" id="lname2" name="lname2"><br>
     <input type="submit" value="Submit">
   </form>
+
+
+<!--Change existing SKU entry:-->
+<h3>Change entry</h3>
+<form id="formChangeEntry" action="/confirmation">
+    <label for="SKU">SKU:</label><br>
+    <input type="text" id="SKU" name="sku"><br>
+    <label for="title">Data Title:</label><br>
+    <input type="text" id="title" name="title"><br>
+    <label for="entry">New Entry:</label><br>
+    <input type="text" id="entry" name="entry"><br>
+    <input type="submit" value="Submit">
+</form>
 
 
   <h3>Read (GET)</h3>
@@ -260,6 +283,43 @@
  
      const response = await fetch ('/skuDelete', {  //uses await just like the other fetch functions
        method: 'DELETE', 
+       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+       headers: {
+         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+       }
+     })
+     //const data = await response.text();
+    })
+
+    //CHANGE ALREADY EXISTING SKU ENTRY
+    const formChangeEntry = document.getElementById('formChangeEntry');  
+    
+    formChangeEntry.addEventListener('submit', async (event)=> {
+     //event.preventDefault();
+ 
+     const formData = new FormData(formChangeEntry);
+ 
+     const response = await fetch ('/skuUpdateEntry', {  //uses await just like the other fetch functions
+       method: 'PUT', 
+       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+       headers: {
+         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+       }
+     })
+     //const data = await response.text();
+    })
+
+
+    //CHANGE ALREADY EXISTING SKU NAME
+    const formChangeSKU = document.getElementById('formChangeSKU');  
+    
+    formChangeSKU.addEventListener('submit', async (event)=> {
+     //event.preventDefault();
+ 
+     const formData = new FormData(formChangeSKU);
+ 
+     const response = await fetch ('/skuChangeName', {  //uses await just like the other fetch functions
+       method: 'PUT', 
        body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
        headers: {
          'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type

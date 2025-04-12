@@ -279,8 +279,8 @@ else if (parsedUrl.pathname == "/skuDelete"){
 //CHANGE ALREADY EXISTING SKU ENTRY
 //catching the table PATH to open each indivual table:
 //GET request
-else if (parsedUrl.pathname == "/skuUpdate"){
-    console.log("sku delete path");
+else if (parsedUrl.pathname == "/skuUpdateEntry"){
+    console.log("sku update entry path");
     let body = "";
     request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
     request.on('end', ()=>{
@@ -300,21 +300,20 @@ else if (parsedUrl.pathname == "/skuUpdate"){
         // const jsonString = JSON.stringify(parsedData);
         // const jsonObject = JSON.parse(jsonString);
         const pData = querystring.parse(body);
+        console.log(pData);
         const jString = JSON.stringify(pData);
+        console.log(jString);
+        console.log(jString.sku, jString.title,jString.entry)
         const jObject = JSON.parse(jString);
         console.log(jObject);
-        console.log(jObject.SKU);
-        const tableName = jObject.SKU;
+        console.log("SKU: " + jObject.sku + " title: " + jObject.title + " updated to: " + jObject.entry);
         
-        //find table in database 
-        console.log(`DROP TABLE ${tableName}`);
-        connection.query(`DROP TABLE ${tableName}`, (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
+        //update table here -->
+        console.log(`UPDATE ${jObject.sku} SET text = ${jObject.entry} WHERE idTest = "${jObject.title}"`)
+        connection.query(`UPDATE ${jObject.sku} SET text = "${jObject.entry}" WHERE idTest = "${jObject.title}"`, (err, results) =>{
+        if (err) {console.log("error updating entry in SKU "+ err); return;}
         else {
-        console.log("Table request Successful!");
-        jsonString = JSON.stringify(results)
-        jsonObject = JSON.parse(jsonString)
-        response.end("Table Name: " + tableName + readRows(jsonObject));
+        console.log("SKU entry update successful!");
         }
         })
         })
@@ -327,8 +326,8 @@ else if (parsedUrl.pathname == "/skuUpdate"){
 //CHANGE ALREADY EXISTING SKU NAME
 //catching the table PATH to open each indivual table:
 //GET request
-else if (parsedUrl.pathname == "/skuChange"){
-    console.log("sku delete path");
+else if (parsedUrl.pathname == "/skuChangeName"){
+    console.log("sku change name path");
     let body = "";
     request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
     request.on('end', ()=>{
@@ -350,19 +349,13 @@ else if (parsedUrl.pathname == "/skuChange"){
         const pData = querystring.parse(body);
         const jString = JSON.stringify(pData);
         const jObject = JSON.parse(jString);
-        console.log(jObject);
-        console.log(jObject.SKU);
-        const tableName = jObject.SKU;
         
         //find table in database 
-        console.log(`DROP TABLE ${tableName}`);
-        connection.query(`DROP TABLE ${tableName}`, (err, results) =>{
+        console.log(`RENAME TABLE ${jObject.SKU} to ${jObject.newSKU}`);
+        connection.query(`RENAME TABLE ${jObject.SKU} to ${jObject.newSKU}`, (err, results) =>{
         if (err) {console.log("error inserting data into database "+ err); return;}
         else {
-        console.log("Table request Successful!");
-        jsonString = JSON.stringify(results)
-        jsonObject = JSON.parse(jsonString)
-        response.end("Table Name: " + tableName + readRows(jsonObject));
+        console.log("SKU Rename Successful!");
         }
         })
         })
