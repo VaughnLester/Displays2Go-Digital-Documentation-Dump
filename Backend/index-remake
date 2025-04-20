@@ -5,11 +5,7 @@ const fs = require('fs');
 const querystring = require('node:querystring');
 
 const server = http.createServer((request, response)=>{
-const url = request.url;
-const method = request.method;
-const parsedUrl = urI.parse(request.url, true)
-
-switch (url){
+switch (request.url){
     case '/newSKU':
         let body = '';
         request.on('data', chunk =>{ 
@@ -43,7 +39,6 @@ switch (url){
         const existingSKU = JSON.parse(JSON.stringify(querystring.parse(body))).existingSKU;
         const title = JSON.parse(JSON.stringify(querystring.parse(body))).title;
         const entry = JSON.parse(JSON.stringify(querystring.parse(body))).entry;
-
         connection.query(`INSERT INTO ${existingSKU} (Title, Entry) VALUES ("${title}", "${entry}")`, (err, results) =>{
         if (err) {console.log("error inserting data into database "+ err); return;}
         else {
@@ -70,39 +65,73 @@ switch (url){
         break;    
 }
 
-switch(parsedUrl.pathname){
+switch(urI.parse(request.url, true).pathname){
     case "/skuPage":
-        console.log("table path entered");
         let body = " ";
-        request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
+        request.on('data', chunk => {body += chunk.toString()})
         request.on('end', ()=>{
-            // const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-            const searchParams = new URLSearchParams(parsedUrl.search);
-            console.log(parsedUrl.search);
-            console.log(searchParams);
-            console.log(searchParams.get('name'));
             response.writeHead(200, {  
             'Content-Type': 'text/html',
-            'Access-Control-Allow-Origin' : '*'});//enables CORS
-            
-            //grabbing first and last name from the parsed url
-            // const jsonString = JSON.stringify(parsedData);
-            // const jsonObject = JSON.parse(jsonString);
-            
-            const tableName = searchParams.get('name');
-            
-            //find table in database 
-            console.log(`SELECT * FROM ${tableName}`);
-            connection.query(`SELECT * FROM ${tableName}`, (err, results) =>{
+            'Access-Control-Allow-Origin' : '*'});    
+            const searchParams = new URLSearchParams(urI.parse(request.url, true).search);        
+            const skuPage = searchParams.get('skuPage');
+            connection.query(`SELECT * FROM ${skuPage}`, (err, results) =>{
             if (err) {console.log("error inserting data into database "+ err); return;}
             else {
-            console.log("Table request Successful!");
-            jsonString = JSON.stringify(results)
-            jsonObject = JSON.parse(jsonString)
-            response.end("Table Name: " + tableName + readRows(jsonObject));
+            response.end("Table Name: " + skuPage + readRows(JSON.parse(JSON.stringify(results))));
             }
             })
             })
+        break;
+    case "/deleteSKU":
+        let body2 = "";
+        request.on('data', chunk => {body2 += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const deleteSKU = JSON.parse(JSON.stringify(querystring.parse(body2))).deleteSKU;
+            connection.query(`DROP TABLE ${deleteSKU}`, (err, results) =>{
+            if (err) {console.log("error inserting data into database "+ err); return;}
+            else {
+            response.end("Table Name: " + deleteSKU + " is deleted");
+            }
+            })
+            })
+        break;
+    case "/deleteSkuEntry":
+            
+        break;
+    case "/skuUpdateEntry":
+        let body3 = "";
+        request.on('data', chunk => {body3 += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            connection.query(`UPDATE ${JSON.parse(JSON.stringify(querystring.parse(body))).skuNameUpdate} SET entry = "${JSON.parse(JSON.stringify(querystring.parse(body))).entryUpdate}" WHERE title = "${JSON.parse(JSON.stringify(querystring.parse(body))).title}"`, (err, results) =>{
+            if (err) {console.log("error updating entry in SKU "+ err); return;}
+            else {
+            console.log("SKU entry update successful!");
+            }
+            })
+            })
+        break;
+    case "/changeSkuName":
+        let body4 = "";
+        request.on('data', chunk => {body4 += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            connection.query(`RENAME TABLE ${JSON.parse(JSON.stringify(querystring.parse(body))).sku} to ${JSON.parse(JSON.stringify(querystring.parse(body))).changeSkuName}`, (err, results) =>{
+            if (err) {console.log("error inserting data into database "+ err); return;}
+            else {
+            console.log(JSON.parse(JSON.stringify(querystring.parse(body))).sku + " changed to " + JSON.parse(JSON.stringify(querystring.parse(body))).changeSkuName);
+            }
+            })
+            })
+        break;
 }
 
 
@@ -132,297 +161,8 @@ function readTables(arr){
 }
 
 
-
-
-
-
-
-
-//------------------------------------------------------------------
-//OPEN INDIVIDUAL SKU TABLE
-//catching the table PATH to open each indivual table:
-//GET request
- if (parsedUrl.pathname == "/table"){
-    console.log("table path entered");
-    let body = " ";
-    request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
-    request.on('end', ()=>{
-        // const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        const searchParams = new URLSearchParams(parsedUrl.search);
-        console.log(parsedUrl.search);
-        console.log(searchParams);
-        console.log(searchParams.get('name'));
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        
-        //grabbing first and last name from the parsed url
-        // const jsonString = JSON.stringify(parsedData);
-        // const jsonObject = JSON.parse(jsonString);
-        
-        const tableName = searchParams.get('name');
-        
-        //find table in database 
-        console.log(`SELECT * FROM ${tableName}`);
-        connection.query(`SELECT * FROM ${tableName}`, (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-        console.log("Table request Successful!");
-        jsonString = JSON.stringify(results)
-        jsonObject = JSON.parse(jsonString)
-        response.end("Table Name: " + tableName + readRows(jsonObject));
-        }
-        })
-        })
-
-}
-
-
-//------------------------------------------------------------------
-//DELETE SKU
-//catching the table PATH to open each indivual table:
-//GET request
-else if (parsedUrl.pathname == "/skuDelete"){
-    console.log("sku delete path");
-    let body = "";
-    request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
-    request.on('end', ()=>{
-        // const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        console.log(body);//chunk is the DATA sent IN the form URL
-        console.log(JSON.stringify(querystring.parse(body)));//puts the data in key:value pair
-        // console.log(parsedUrl);
-        // console.log(parsedUrl.href);
-        // const searchParams = new URLSearchParams(parsedUrl.search);
-        // console.log(parsedUrl.search);
-        // console.log(searchParams);
-        // console.log(searchParams.get('SKU'));
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        //grabbing first and last name from the parsed url
-        // const jsonString = JSON.stringify(parsedData);
-        // const jsonObject = JSON.parse(jsonString);
-        const pData = querystring.parse(body);
-        const jString = JSON.stringify(pData);
-        const jObject = JSON.parse(jString);
-        console.log(jObject);
-        console.log(jObject.SKU);
-        const tableName = jObject.SKU;
-        
-        //find table in database 
-        console.log(`DROP TABLE ${tableName}`);
-        connection.query(`DROP TABLE ${tableName}`, (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-        console.log("Table request Successful!");
-        jsonString = JSON.stringify(results)
-        jsonObject = JSON.parse(jsonString)
-        response.end("Table Name: " + tableName + readRows(jsonObject));
-        }
-        })
-        })
-
-}
-
-
-
-
-
-//------------------------------------------------------------------
-//CHANGE ALREADY EXISTING SKU ENTRY
-//catching the table PATH to open each indivual table:
-//GET request
-else if (parsedUrl.pathname == "/skuUpdateEntry"){
-    console.log("sku update entry path");
-    let body = "";
-    request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
-    request.on('end', ()=>{
-        // const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        console.log(body);//chunk is the DATA sent IN the form URL
-        console.log(JSON.stringify(querystring.parse(body)));//puts the data in key:value pair
-        // console.log(parsedUrl);
-        // console.log(parsedUrl.href);
-        // const searchParams = new URLSearchParams(parsedUrl.search);
-        // console.log(parsedUrl.search);
-        // console.log(searchParams);
-        // console.log(searchParams.get('SKU'));
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        //grabbing first and last name from the parsed url
-        // const jsonString = JSON.stringify(parsedData);
-        // const jsonObject = JSON.parse(jsonString);
-        const pData = querystring.parse(body);
-        console.log(pData);
-        const jString = JSON.stringify(pData);
-        console.log(jString);
-        console.log(jString.sku, jString.title,jString.entry)
-        const jObject = JSON.parse(jString);
-        console.log(jObject);
-        console.log("SKU: " + jObject.sku + " title: " + jObject.title + " updated to: " + jObject.entry);
-        
-        //update table here -->
-        console.log(`UPDATE ${jObject.sku} SET text = ${jObject.entry} WHERE idTest = "${jObject.title}"`)
-        connection.query(`UPDATE ${jObject.sku} SET text = "${jObject.entry}" WHERE idTest = "${jObject.title}"`, (err, results) =>{
-        if (err) {console.log("error updating entry in SKU "+ err); return;}
-        else {
-        console.log("SKU entry update successful!");
-        }
-        })
-        })
-
-}
-
-
-
-//------------------------------------------------------------------
-//CHANGE ALREADY EXISTING SKU NAME
-//catching the table PATH to open each indivual table:
-//GET request
-else if (parsedUrl.pathname == "/skuChangeName"){
-    console.log("sku change name path");
-    let body = "";
-    request.on('data', chunk => {body += chunk.toString()})//determines what happens on request (when the path/link is clicked), if you don't put anything here, it will just load endlessly becasuse it dosn't know what to do on the request - i think this is becasue your using the path name /table, but then you have more data to it as well that needs to be handled
-    request.on('end', ()=>{
-        // const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        console.log(body);//chunk is the DATA sent IN the form URL
-        console.log(JSON.stringify(querystring.parse(body)));//puts the data in key:value pair
-        // console.log(parsedUrl);
-        // console.log(parsedUrl.href);
-        // const searchParams = new URLSearchParams(parsedUrl.search);
-        // console.log(parsedUrl.search);
-        // console.log(searchParams);
-        // console.log(searchParams.get('SKU'));
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        //grabbing first and last name from the parsed url
-        // const jsonString = JSON.stringify(parsedData);
-        // const jsonObject = JSON.parse(jsonString);
-        const pData = querystring.parse(body);
-        const jString = JSON.stringify(pData);
-        const jObject = JSON.parse(jString);
-        
-        //find table in database 
-        console.log(`RENAME TABLE ${jObject.SKU} to ${jObject.newSKU}`);
-        connection.query(`RENAME TABLE ${jObject.SKU} to ${jObject.newSKU}`, (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-        console.log("SKU Rename Successful!");
-        }
-        })
-        })
-
-}
-
-
-
-
-
-
-
-
-//ROUTE: /input (respondes with databse query (INSERT))
-//clean this code!
-else if (parsedUrl.pathname == "/input"){  //The path created on the form -> action attribute + the information you submitted (which is why yo uhave to parse it)
-//use request.on to handle received data
-
-//the body remains empty!! so your not pulling data, your pulling just the href!! this needs to be fixed!!
-let body = '';
-request.on('data',chunk => {body += chunk.toString();});
-request.on('end',()=>{
-//const x = querystring(body);  
-//inserting the data into the database 
-console.log("Parsed: " + body);  
-const sql = 'INSERT INTO test (idtest, text) values(?,?)'
-//here, your putting in the entire href (end of url)
-connection.query(sql,["4", parsedUrl.href], (err, results) =>{
-if (err) {console.log("error inserting data into database"); return;}
-console.log("Data entered successfully into database!");
-console.log("Data entered: " + parsedUrl.href);
-//parse form data here to start
-}) 
-response.writeHead(200, {
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-response.end("data received: " + parsedUrl.href)
-});
-} 
-
-
-
-
-//POST
-//retreiving form data the right way!!
-else if (request.method === 'POST' && request.url === '/'){
-console.log('create path found');
-let body = '';
-request.on('data', chunk =>{ //chunk is the end of the url
-body += chunk.toString();
-});
-request.on('end', ()=>{
-const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-response.writeHead(200, {  
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-
-//grabbing first and last name from the parsed url
-const jsonString = JSON.stringify(parsedData);
-const jsonObject = JSON.parse(jsonString);
-console.log(jsonObject);
-const fname = jsonObject.fname;
-const lname = jsonObject.lname;
-
-
-//inserting first and last name into databse 
-const sql = 'INSERT INTO test (idtest, text) values(?,?)'
-connection.query(sql,[fname, lname], (err, results) =>{
-if (err) {console.log("error inserting data into database "+ err); return;}
-else {
-console.log("Database entry successful: " + fname + ' ' + lname);}
-})
-response.end(`Received data: ${JSON.stringify(parsedData)}`);
-})
-}
-
-
-
-
-//PUT
-else if (request.method === 'PUT' && request.url === '/'){
-console.log('update path found');
-let body = '';
-request.on('data', chunk =>{ //chunk is the end of the url
-body += chunk.toString();
-});
-request.on('end', ()=>{
-const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-response.writeHead(200, {  
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-
-//grabbing first and last name from the parsed url
-const jsonString = JSON.stringify(parsedData);
-const jsonObject = JSON.parse(jsonString);
-
-const fname = jsonObject.fname;
-const lname = jsonObject.lname;
-
-
-//inserting first and last name into databse 
-const sql = 'UPDATE test SET text = ? WHERE idtest = ?;'
-connection.query(sql,[lname, fname], (err, results) =>{
-if (err) {console.log("error inserting data into database "+ err); return;}
-else {
-console.log("Database update successful: " + fname + ' ' + lname);}
-})
-response.end(`Received data: ${JSON.stringify(parsedData)}`);
-})
-}
-
-
 //DELETE
-else if (request.method === 'DELETE' && request.url === '/'){
+if (request.method === 'DELETE' && request.url === '/'){
 console.log('delete path found');
 let body = '';
 request.on('data', chunk =>{ //chunk is the end of the url
