@@ -62,7 +62,18 @@ switch (request.url){
             response.write(readTables(JSON.parse(JSON.stringify(results))));
             response.end();
             });
-        break;    
+        break; 
+    default:
+    response.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin' : '*'});
+    fs.createReadStream('index.html').pipe(response);
+    fs.readFile('index.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end}
+        else {
+        response.end(content);
+        }
+        })
 }
 
 switch(urI.parse(request.url, true).pathname){
@@ -100,7 +111,19 @@ switch(urI.parse(request.url, true).pathname){
             })
         break;
     case "/deleteSkuEntry":
-            
+        let deleteBody = "";
+        request.on('data', chunk => {deleteBody += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            connection.query(`DELETE FROM ${JSON.parse(JSON.stringify(querystring.parse(deleteBody))).sku} WHERE Title='${JSON.parse(JSON.stringify(querystring.parse(deleteBody))).deleteSkuEntry}'`, (err, results) =>{
+            if (err) {console.log("error updating entry in SKU "+ err); return;}
+            else {
+            console.log("SKU entry deleted " + results);
+            }
+            })
+            })
         break;
     case "/skuUpdateEntry":
         let body3 = "";
@@ -112,7 +135,7 @@ switch(urI.parse(request.url, true).pathname){
             connection.query(`UPDATE ${JSON.parse(JSON.stringify(querystring.parse(body))).skuNameUpdate} SET entry = "${JSON.parse(JSON.stringify(querystring.parse(body))).entryUpdate}" WHERE title = "${JSON.parse(JSON.stringify(querystring.parse(body))).title}"`, (err, results) =>{
             if (err) {console.log("error updating entry in SKU "+ err); return;}
             else {
-            console.log("SKU entry update successful!");
+            console.log("SKU entry update successful! " + results);
             }
             })
             })
@@ -132,7 +155,52 @@ switch(urI.parse(request.url, true).pathname){
             })
             })
         break;
+    case "/confirmation":
+        response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});//enables CORS
+            fs.readFile('confirmation.html', function(err,content){
+            if(err){
+            console.log(err);
+            response.end;
+            }
+            else{
+            response.end(content);
+            }
+            })
+        break;
+    default:
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        fs.createReadStream('index.html').pipe(response);
+        fs.readFile('index.html', function(err, content){
+            if (err){console.log("error occurred trying to send html file"); response.end}
+            else {
+            response.end(content);
+            }
+            })
 }
+})
+
+//creating database connection
+const connection = mysql.createConnection({
+host:'sql5.freesqldatabase.com',
+user: 'sql5768538',
+password: '9np9VjdEks',
+database: 'sql5768538'
+});
+
+//connecting database
+connection.connect(function(err)
+{
+if (err){console.log("error occurred while attempting connection: ", err)}
+else {console.log("database connection successful!")}
+}
+);
+
+//connecting server
+server.listen(5001, console.log("server is listening on 5001"));
 
 
 
@@ -159,162 +227,3 @@ function readTables(arr){
     }
     return results;
 }
-
-
-//DELETE
-if (request.method === 'DELETE' && request.url === '/'){
-console.log('delete path found');
-let body = '';
-request.on('data', chunk =>{ //chunk is the end of the url
-body += chunk.toString();
-});
-request.on('end', ()=>{
-const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-response.writeHead(200, {  
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-
-//grabbing first and last name from the parsed url
-const jsonString = JSON.stringify(parsedData);
-const jsonObject = JSON.parse(jsonString);
-
-const fname = jsonObject.fname;
-
-//inserting first and last name into databse 
-const sql = 'DELETE FROM test WHERE idtest = ?;'
-connection.query(sql,[fname], (err, results) =>{
-if (err) {console.log("error inserting data into database "+ err); return;}
-else {
-console.log("Database delete successful: " + fname + " deleted");}
-})
-response.end(`Received data: ${JSON.stringify(parsedData)}`);
-})
-}
-
-
-
-//form submit confirmation
-else if (parsedUrl.pathname == "/confirmation"){
-response.writeHead(200, {
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-fs.readFile('confirmation.html', function(err,content){
-if(err){
-console.log(err);
-response.end;
-}
-else{
-response.end(content);
-}
-})
-}
-
-//if no route is found - returning your index.html homepage from server!!!
-else 
-{
-// response.writeHead(200, {
-// 'Content-Type': 'text/html',
-// 'Access-Control-Allow-Origin' : '*'});//enables CORS
-// fs.createReadStream('index.html').pipe(response);
-fs.readFile('index.html', function(err, content){
-if (err){console.log("error occurred trying to send html file"); response.end}
-else {
-response.end(content);
-}
-})
-// response.end('Not one of your designated endpoints! But we are connected!');
-}
-}
-);
-
-//creating database connection
-const connection = mysql.createConnection({
-host:'sql5.freesqldatabase.com',
-user: 'sql5768538',
-password: '9np9VjdEks',
-database: 'sql5768538'
-});
-
-//connecting database
-connection.connect(function(err)
-{
-if (err){console.log("error occurred while attempting connection: ", err)}
-else {console.log("database connection successful!")}
-}
-);
-
-function insertData(){
-//inserting data into database
-var data = "INSERT INTO test (idtest, text) VALUES ('1', 'This is sample text!')";
-connection.query(data, function(err){
-if (err) {console.log("error entering data into the database...");}
-console.log("Data entry successful!");
-});
-
-//inserting more data into database
-
-var data2 = "INSERT INTO test (idtest, text) VALUES ('2', 'sample text!')";
-connection.query(data2, function(err){
-if (err) {console.log("error entering data into the database...");}
-console.log("Data entry successful!");
-});
-}
-
-//pulling data from backend 
-function pullData(){
-var x = "";
-var y = "original value";
-var z = "";
-connection.connect(function(err){
-if(err){console.log("error occurred whilte attempting connection: ", err)}
-else {console.log("database conncection successful")}
-})
-var data = "SELECT text FROM test where idtest = 1";
-
-y =  connection.query(data, (err,results)=>{
-if (err){return "there was an erro!";}
-console.log("raw sql pull: " + results);
-x = JSON.stringify(results);
-console.log("raw pull stringify: " + x); //prints out correctly
-y = JSON.parse(x);
-console.log("raw pull stringify parsed: " + y);
-console.log(y instanceof Object);
-})
-console.log("after the function: " + JSON.stringify(y)); //prints out incorrectly 
-//x = JSON.stringify(y);
-//z = JSON.parse(x);
-return y;
-}
-//pullData();
-
-
-//pull data from database and return an array:
-var theData = "";
-function returnData(){ //the problems is it's returning the QUERY itself and not the RESULTS! we need to extract the RESULTS and then stringy it in the response . write on the api 
-var data = "SELECT text FROM test where idtest = 1";
-var dataArray = "original value";
-(connection.query(data, (err,results)=>{
-if (err){return "there was an erro!";}
-dataArray = results.map(row => Object.values(row));
-theData = results;
-return results;
-}
-))
-}
-
-
-console.log("new function" + JSON.stringify(returnData()));
-
-//connecting server
-server.listen(5001, console.log("server is listening on 5001"));
-
-
-
-var wo = 5
-function gg (){
-wo =7;
-}
-gg();
-console.log(wo);
-
-console.log(JSON.stringify(returnData()));
