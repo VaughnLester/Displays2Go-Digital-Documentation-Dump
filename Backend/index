@@ -1,5 +1,7 @@
 //Index - Entry point to the application (see package.json, main attribute)
 //This full stack application uses raw Node modules from scaratch without the assistance of any frameworks such as express!
+//Website is hosted on render.com
+//Database is hosted on freesqldatabase.com
 
 //Node module breakdown:
 //1. http - used to create server
