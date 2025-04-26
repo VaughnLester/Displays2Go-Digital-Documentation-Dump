@@ -1,114 +1,96 @@
 <!DOCTYPE html>
 <html>
 
-  <style>
-    h3{
-        color: rgb(9, 9, 150);
-    }
-  </style>
-  
   <body>
-    <!--Home Page Header-->
-    <h3 style="color:black;">Author: Vaughn Lester - Tech Support Representative</h3>
-    <u><h1>Displays2Go : Digital Documentation Database</h1></u><br>
 
-    <!-- <h1><u>Example Fetch Data</u></h1>
-    <h1 id="test">This will change if it works!</h1>
-    <h1 id="text">This will change if it works!</h1>
-    <h1 id="databasePull">This will change if it works!</h1> -->
-    
-    <!-------Forms----------->
-    <!--Action= sends the form to a url after submitting usually, but here I have added a custom submit button event to each form to do even more-->
-    <!--Reminder: Add error handling to all forms! and on backend too!-->
+  <h1>Hello, Welcome To My Page</h1><br>
 
-    <!--Create New SKU-->
-    <h3>Add SKU To Database (Must not have spaces)</h3>
-    <form id="addNewSku" action="/confirmation">
-        <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
-        <input type="submit" value="Submit">
-    </form>
+  <h1><u>Example Fetch Data</u></h1>
+  <h1 id="test">This will change if it works!</h1>
+  <h1 id="text">This will change if it works!</h1>
+  <h1 id="databasePull">This will change if it works!</h1>
 
 
+  <!--Sending form data to database-->
+  <h3>Create (POST)</h3>
+  <form id="form" action="/confirmation">
+    <label for="fname">First name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Last name:</label><br>
+    <input type="text" id="lname" name="lname">
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Create new SKU(POST)</h3>
+  <form id="formSKU" action="/confirmation">
+    <label for="fname">New SKU:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Delete SKU</h3> SKU(POST)</h3>
+  <form id="formDelete" action="/confirmation">
+    <label for="SKU">Delete SKU:</label><br>
+    <input type="text" id="SKU" name="SKU"><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <!--Change Existing SKU-->
+  <h3>Change SKU</h3> SKU(POST)</h3>
+  <form id="formChangeSKU" action="/confirmation">
+    <label for="SKU">Change SKU:</label><br>
+    <input type="text" id="SKU" name="SKU"><br>
+    <label for="newSKU">New SKU Name:</label><br>
+    <input type="text" id="newSKU" name="newSKU"><br><!--Name determines what is sent in the url!-->
+    <input type="submit" value="Submit">
+  </form>
+
+  <!--Add to existing SKU:-->
+  <h3>Add Data</h3>
+  <form id="formAdd" action="/confirmation">
+    <label for="fname">SKU:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Data Title:</label><br>
+    <input type="text" id="lname" name="lname"><br>
+    <label for="lname2">New Entry:</label><br>
+    <input type="text" id="lname2" name="lname2"><br>
+    <input type="submit" value="Submit">
+  </form>
 
 
+<!--Change existing SKU entry:-->
+<h3>Change entry</h3>
+<form id="formChangeEntry" action="/confirmation">
+    <label for="SKU">SKU:</label><br>
+    <input type="text" id="SKU" name="sku"><br>
+    <label for="title">Data Title:</label><br>
+    <input type="text" id="title" name="title"><br>
+    <label for="entry">New Entry:</label><br>
+    <input type="text" id="entry" name="entry"><br>
+    <input type="submit" value="Submit">
+</form>
 
 
+  <h3>Read (GET)</h3>
+  <a href="/databasePull">/databasePull</a><br>
+  <a href="/home">/home</a><br>
+  <a href="/text">/text</a><br>
 
+  <h3>Update (PUT)</h3>
+  <form id="form2" action="/confirmation">
+    <label for="fname">First name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <label for="lname">Change Last Name To:</label><br>
+    <input type="text" id="lname" name="lname">
+    <input type="submit" value="Submit">
+  </form>
 
-
-
-
-    <h3>Create new SKU(POST)</h3>
-    <form id="formSKU" action="/confirmation">
-        <label for="fname">New SKU:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <h3>Delete SKU</h3> SKU(POST)</h3>
-    <form id="formDelete" action="/confirmation">
-        <label for="SKU">Delete SKU:</label><br>
-        <input type="text" id="SKU" name="SKU"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Change Existing SKU-->
-    <h3>Change SKU</h3> SKU(POST)</h3>
-    <form id="formChangeSKU" action="/confirmation">
-        <label for="SKU">Change SKU:</label><br>
-        <input type="text" id="SKU" name="SKU"><br>
-        <label for="newSKU">New SKU Name:</label><br>
-        <input type="text" id="newSKU" name="newSKU"><br><!--Name determines what is sent in the url!-->
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Add to existing SKU:-->
-    <h3>Add Data</h3>
-    <form id="formAdd" action="/confirmation">
-        <label for="fname">SKU:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <label for="lname">Data Title:</label><br>
-        <input type="text" id="lname" name="lname"><br>
-        <label for="lname2">New Entry:</label><br>
-        <input type="text" id="lname2" name="lname2"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-
-    <!--Change existing SKU entry:-->
-    <h3>Change entry</h3>
-    <form id="formChangeEntry" action="/confirmation">
-        <label for="SKU">SKU:</label><br>
-        <input type="text" id="SKU" name="sku"><br>
-        <label for="title">Data Title:</label><br>
-        <input type="text" id="title" name="title"><br>
-        <label for="entry">New Entry:</label><br>
-        <input type="text" id="entry" name="entry"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-
-    <h3>Read (GET)</h3>
-    <a href="/databasePull">/databasePull</a><br>
-    <a href="/home">/home</a><br>
-    <a href="/text">/text</a><br>
-
-    <h3>Update (PUT)</h3>
-    <form id="form2" action="/confirmation">
-        <label for="fname">First name:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <label for="lname">Change Last Name To:</label><br>
-        <input type="text" id="lname" name="lname">
-        <input type="submit" value="Submit">
-    </form>
-
-    <h3>Delete (DELETE)</h3>
-    <form id="form3" action="/confirmation">
-        <label for="fname">Enter First Name - Delete Name:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <input type="submit" value="Submit">
-    </form>
+  <h3>Delete (DELETE)</h3>
+  <form id="form3" action="/confirmation">
+    <label for="fname">Enter First Name - Delete Name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <input type="submit" value="Submit">
+  </form>
 
   </body>
 
@@ -119,39 +101,6 @@
 
 
   <script>
-    //Front End Requests - Form Handlers:
-    //1. Add 'submit' Event Listener to Form - use event.preventDefault() to cancel action="url" if needed
-    //2. Give it an async-await function
-    //3. Now you can grab the form data (the entries) by using FormData class
-    //4. Create a response variable that is await for the fetch value of this forms counter part on the backend
-    //5. Send FormData parameters to the backend in the fetch request - handle request on the backend by it's specific url
-    //6. Async-Await is used here just like it is used in the normal function request by itself, your just doing it in a event listener here
-    //7. Fetch args accept the url path, and url parameters, including but not limited to method (GET,POST,PUT,DELETE), body (what your sending to backend), and headers (just the header for the content, can be text, html, etc)
-    //8. It appears as though form requests do not elicit a write response from the server, rather they will only go to the action= url
-
-   //-----------------Front End Request: Create New Sku --------------------
-   const newSkuForm = document.getElementById('addNewSku');  
-   newSkuForm.addEventListener('submit', async (event)=> {
-    //event.preventDefault();
-    const formData = new FormData(newSkuForm);
-    const response = await fetch ('/newSKU', {  
-      method: 'POST', 
-      body: new URLSearchParams(formData),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
-   })
-
-
-
-
-
-
-
-
-
-
 
     //fetching html content from server
     // fetch("http://localhost:5001/home")
@@ -283,7 +232,25 @@
     })
    })
 
+   //CREATE - new SKU table
+   //sending the form data HERE instead of in the FORM in order to access the FormData values
+   const formSKU = document.getElementById('formSKU');  
+    
+   formSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
 
+    const formData = new FormData(formSKU);
+
+    const response = await fetch ('/newSKU', {  //uses await just like the other fetch functions
+      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
+      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
+      }
+    })
+    //const data = await response.text();
+    //alert(data);
+   })
 
 
     //CREATE - add data to existing SKU

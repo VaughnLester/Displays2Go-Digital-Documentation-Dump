@@ -1,53 +1,73 @@
-//Index - Entry point to the application (see package.json, main attribute)
-//This full stack application uses raw Node modules from scaratch without the assistance of any frameworks such as express!
-
-//Node module breakdown:
-//1. http - used to create server
-//2. mysql - used to initiate the mysql databse
-//3. url - provides utilities for parsing, constructing, and manipulating URLs
-//4. fs - used to read and write files (can be sent in response from server)
-//5. node:querystring - used to parse form data (sent from frontend)
-
-const http = require('http'); 
-const mysql = require('mysql2'); 
-const urlParsing = require('url'); 
-const fs = require('fs'); 
-const querystring = require('node:querystring');
+//Entry point for the application (see package.json, main attribute)
+const http = require('http'); //http module -> used to create server  
+const mysql = require('mysql2'); //mysql module -> used to initiate the mysql database
+const urI = require('url'); //url module -> used to create api endpoints
+const fs = require('fs'); //fs module -> used to read and serve frontend files 
+const querystring = require('node:querystring');//used to parse submitted form data
 
 
 //SERVER
-//1. Request = what is coming from the frontend, it's url (chunk is the end of the url)
-//2. Response = what will be sent back to the frontend
-//3. The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-//4. Must inlude headers to enable CORS for communication between fronend-backend
 const server = http.createServer((request, response)=>{
 const url = request.url;
 const method = request.method;
-const parsedUrl = urlParsing.parse(url, true)
+const parsedUrl = urI.parse(request.url, true)
 
-//Swtich statement to cleanly handle the requests coming from the front end 
+//ENDPOINTS   
+//this needs to pull the idtest only, then you should be able to click the idtest to bring you to a page that displays all text that was added for it 
 switch (`${url}`){
-
-    //Server Response: Create New Sku
+    // case '/databasePull':
+    //     console.log("pull entered")
+    //     //revise this:
+    //     //pull ALL tables - each TABLE should be a link to all of that TABLE's ENTRIES!
+    //     connection.query('SHOW TABLES;', (err,results) =>{ //First create SQL query
+    //         if (err){ //handle error
+    //             console.log("there was an error")
+    //             // response.writeHead(200, {
+    //             // 'Content-Type': 'text/html',
+    //             // 'Access-Control-Allow-Origin' : '*'});//enables CORS
+    //             response.end('error fetching data');
+    //             return;
+    //         }
+    //         // response.writeHead(200, { //Then respond with SQL query results 
+    //         // 'Content-Type': 'text/html',
+    //         // 'Access-Control-Allow-Origin' : '*'});//enables CORS
+    //         // jsonString = JSON.stringify(results);
+    //         // jsonObject = JSON.parse(jsonString);
+    //         // response.write(readTables(jsonObject));
+    //         response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
+    //         response.end();
+    //     });
+    //     break;
+    //create new SKU table
+    //CREATE NEW SKU
     case '/newSKU':
         let body = '';
-        request.on('data', chunk =>{ 
+        request.on('data', chunk =>{ //chunk is the end of the url
         body += chunk.toString();
         });
         request.on('end', ()=>{
-        const parsedData = querystring.parse(body);
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});
+        const parsedData = querystring.parse(body); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
+        // response.writeHead(200, {  
+        // 'Content-Type': 'text/html',
+        // 'Access-Control-Allow-Origin' : '*'});//enables CORS
+        
+        //grabbing first and last name from the parsed url
         const jsonString = JSON.stringify(parsedData);
         const jsonObject = JSON.parse(jsonString);
-        const newSKU = jsonObject.sku
-        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, PRIMARY KEY (entryID));`, (err, results) =>{
-            if (err) {console.log(err); return;}
-            else {console.log(`${newSKU} added to database!`);}})
-            response.end();
+        
+        const fname = jsonObject.fname;
+        const lname = jsonObject.lname;
+        
+        console.log("new table about to create");
+        //inserting first and last name into databse 
+        connection.query(`CREATE TABLE ${fname} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, PRIMARY KEY (entryID));`, (err, results) =>{
+        if (err) {console.log("error inserting data into database "+ err); return;}
+        else {
+        console.log("Database table creation successful: " + fname + ' ' + lname);}
+        })
+        response.end(`Received data: ${JSON.stringify(parsedData)}`);
         });
-    break;
+        break;
     //CREATE NEW ENTRY FOR EXISTING SKU
     //add data to existing SKU
     case '/skuAdd':
