@@ -27,17 +27,17 @@ const url = request.url;
 const method = request.method;
 const parsedUrl = urlParsing.parse(url, true)
 
-//Swtich statement to cleanly handle the requests coming from the front end 
-switch (`${url}`){
+//Creating API Endpoints: 
+switch(url){
 
-    //Server Response: Create New Sku
+    //Server response: Add new SKU
     case '/newSKU':
-        let body = '';
+        let newSKUbody = '';
         request.on('data', chunk =>{ 
-        body += chunk.toString();
+        newSKUbody += chunk.toString();
         });
         request.on('end', ()=>{
-        const parsedData = querystring.parse(body);
+        const parsedData = querystring.parse(newSKUbody);
         response.writeHead(200, {  
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin' : '*'});
@@ -50,37 +50,188 @@ switch (`${url}`){
             response.end();
         });
     break;
-    //CREATE NEW ENTRY FOR EXISTING SKU
-    //add data to existing SKU
-    case '/skuAdd':
-        let body2 = '';
-        request.on('data', chunk =>{ //chunk is the end of the url
-        body2 += chunk.toString();
+
+    //Server response: Delete SKU
+    case '/deleteSKU':
+        let deleteSKUbody = '';
+        request.on('data', chunk =>{ 
+        deleteSKUbody += chunk.toString();
         });
         request.on('end', ()=>{
-        const parsedData = querystring.parse(body2); //parsing the end of the url - * The querystring. parse() method parses a URL query string ( str ) into a collection of key and value pairs * , aka JSON string
-        // response.writeHead(200, {  
-        // 'Content-Type': 'text/html',
-        // 'Access-Control-Allow-Origin' : '*'});//enables CORS
-        
-        //grabbing first and last name from the parsed url
+        const parsedData = querystring.parse(deleteSKUbody);
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
         const jsonString = JSON.stringify(parsedData);
         const jsonObject = JSON.parse(jsonString);
-        
-        const fname = jsonObject.fname;
-        const lname = jsonObject.lname;
-        const lname2 = jsonObject.lname2;
-        
-        //inserting first and last name into databse 
-        connection.query(`INSERT INTO ${fname} (Title, Entry) VALUES ("${lname}", "${lname2}")`, (err, results) =>{
-        if (err) {console.log("error inserting data into database "+ err); return;}
-        else {
-        console.log("Database table update successful: " + fname + ' ' + lname);}
-        })
-        response.end(`Received data: ${JSON.stringify(parsedData)}`);
+        const deleteSKU = jsonObject.sku
+        connection.query(`DROP TABLE ${deleteSKU}`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${deleteSKU} deleted from database!`);}})
+            response.end();
         });
-        break;
+    break;
+
+    //Server response: Delete SKU
+    case '/changeSKU':
+        let changeSKUbody = '';
+        request.on('data', chunk =>{ 
+        changeSKUbody += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(changeSKUbody);
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        const currentSKU = jsonObject.sku;
+        const updatedSKU = jsonObject.newSKU;
+        connection.query(`RENAME TABLE ${currentSKU} to ${updatedSKU}`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${currentSKU} changed to ${updatedSKU}!`);}})
+            response.end();
+        });
+    break;
+
+    //Server response: Add Sku Entry
+    case '/addEntry':
+        let addEntrybody = '';
+        request.on('data', chunk =>{ 
+        addEntrybody += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(addEntrybody); 
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        const addEntrySKU = jsonObject.sku;
+        const addEntryTitle = jsonObject.title;
+        const addEntryEntry = jsonObject.entry;
+        connection.query(`INSERT INTO ${addEntrySKU} (Title, Entry) VALUES ("${addEntryTitle}", "${addEntryEntry}")`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${addEntryTitle} added to ${addEntrySKU}!`);}
+        })
+        response.end();
+        });
+    break;
+
+    //Server response: Updated Data Title
+    case '/updateTitle':
+        let updateTitleBody = '';
+        request.on('data', chunk =>{ 
+        updateTitleBody += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(updateTitleBody); 
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        const updateTitleSKU = jsonObject.sku;
+        const updateTitle1 = jsonObject.title;
+        const updateTitle2 = jsonObject.updatedTitle;
+        connection.query(`UPDATE ${updateTitleSKU} SET title = "${updateTitle2}" WHERE title = "${updateTitle1}"`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${updateTitle1} updated to ${updateTitle2} in ${updateTitleSKU}`);}
+        })
+        response.end();
+        });
+    break;
+
+    //Server response: Update Data Entry
+    case '/updateEntry':
+        let updateSkuEntrybody = '';
+        request.on('data', chunk =>{ 
+        updateSkuEntrybody += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(updateSkuEntrybody); 
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        const updateSkuEntrySKU = jsonObject.sku;
+        const updateSkuEntryTitle = jsonObject.title;
+        const updateSkuEntryEntry = jsonObject.skuEntry;
+        connection.query(`UPDATE ${updateSkuEntrySKU} SET entry = "${updateSkuEntryEntry}" WHERE title = "${updateSkuEntryTitle}"`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${updateSkuEntryTitle} updated in ${updateSkuEntrySKU} to ${updateSkuEntryEntry}!`);}
+        })
+        response.end();
+        });
+    break;
+
+    //Server response: Delete a SKU entry
+    case '/deleteData':
+        let deleteSkuEntrybody = '';
+        request.on('data', chunk =>{ 
+        deleteSkuEntrybody += chunk.toString();
+        });
+        request.on('end', ()=>{
+        const parsedData = querystring.parse(deleteSkuEntrybody); 
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        const jsonString = JSON.stringify(parsedData);
+        const jsonObject = JSON.parse(jsonString);
+        const deleteSkuEntrySKU = jsonObject.sku;
+        const deleteSkuEntryTitle = jsonObject.title;
+        connection.query(`DELETE FROM ${deleteSkuEntrySKU} WHERE title = "${deleteSkuEntryTitle}"`, (err, results) =>{
+            if (err) {console.log(err); return;}
+            else {console.log(`${deleteSkuEntryTitle} deleted from ${deleteSkuEntrySKU}!`);}
+        })
+        response.end();
+        });
+    break;
+
+    //Server response: Show all SKUs
+    case '/databasePull':
+        connection.query('SHOW TABLES;', (err,results) =>{ //First create SQL query
+        if (err){ //handle error
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        response.end('error fetching data');
+        return;
+        }
+        response.writeHead(200, { //Then respond with SQL query results 
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        jsonString = JSON.stringify(results);
+        jsonObject = JSON.parse(jsonString);
+        console.log(jsonObject.length);
+    
+        fname = jsonObject[0].idTest;
+        lname = jsonObject[0].text;
+        response.write(readTables(jsonObject));
+        response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
+        response.end();
+        });
+    break;
 }
+
+//Server response: Serves confirmation page after form submission
+//Placed outside switch statement becasue using a different variable 
+ if (parsedUrl.pathname == "/confirmation"){
+response.writeHead(200, {
+'Content-Type': 'text/html',
+'Access-Control-Allow-Origin' : '*'});//enables CORS
+fs.readFile('confirmation.html', function(err,content){
+if(err){
+console.log(err);
+response.end;
+}
+else{
+response.end(content);
+}
+})
+}
+
 
 
 
@@ -482,21 +633,6 @@ response.end(`Received data: ${JSON.stringify(parsedData)}`);
 
 
 
-//form submit confirmation
-else if (parsedUrl.pathname == "/confirmation"){
-response.writeHead(200, {
-'Content-Type': 'text/html',
-'Access-Control-Allow-Origin' : '*'});//enables CORS
-fs.readFile('confirmation.html', function(err,content){
-if(err){
-console.log(err);
-response.end;
-}
-else{
-response.end(content);
-}
-})
-}
 
 //if no route is found - returning your index.html homepage from server!!!
 else 

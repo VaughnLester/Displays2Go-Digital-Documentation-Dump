@@ -29,99 +29,80 @@
         <input type="submit" value="Submit">
     </form>
 
-
-
-
-
-
-
-
-
-
-
-    <h3>Create new SKU(POST)</h3>
-    <form id="formSKU" action="/confirmation">
-        <label for="fname">New SKU:</label><br>
-        <input type="text" id="fname" name="fname"><br>
+    <!--Delete SKU-->
+    <h3>Delete SKU</h3>
+    <form id="deleteSKU" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
         <input type="submit" value="Submit">
     </form>
 
-    <h3>Delete SKU</h3> SKU(POST)</h3>
-    <form id="formDelete" action="/confirmation">
-        <label for="SKU">Delete SKU:</label><br>
-        <input type="text" id="SKU" name="SKU"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Change Existing SKU-->
-    <h3>Change SKU</h3> SKU(POST)</h3>
-    <form id="formChangeSKU" action="/confirmation">
-        <label for="SKU">Change SKU:</label><br>
-        <input type="text" id="SKU" name="SKU"><br>
-        <label for="newSKU">New SKU Name:</label><br>
-        <input type="text" id="newSKU" name="newSKU"><br><!--Name determines what is sent in the url!-->
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Add to existing SKU:-->
-    <h3>Add Data</h3>
-    <form id="formAdd" action="/confirmation">
-        <label for="fname">SKU:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <label for="lname">Data Title:</label><br>
-        <input type="text" id="lname" name="lname"><br>
-        <label for="lname2">New Entry:</label><br>
-        <input type="text" id="lname2" name="lname2"><br>
+    <!--Change SKU Name-->
+    <h3>Change SKU Name</h3>
+    <form id="changeSKU" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="newSKU">New Name:</label><br>
+        <input type="text" id="newSKU" name="newSKU"><br>
         <input type="submit" value="Submit">
     </form>
 
 
-    <!--Change existing SKU entry:-->
-    <h3>Change entry</h3>
-    <form id="formChangeEntry" action="/confirmation">
-        <label for="SKU">SKU:</label><br>
-        <input type="text" id="SKU" name="sku"><br>
-        <label for="title">Data Title:</label><br>
+    <!--Add SKU Entry-->
+    <h3>Add Data Entry</h3>
+    <form id="addSkuEntry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
         <input type="text" id="title" name="title"><br>
-        <label for="entry">New Entry:</label><br>
-        <input type="text" id="entry" name="entry"><br>
+        <label for="skuEntry">Entry:</label><br>
+        <input type="text" id="skuEntry" name="skuEntry"><br>
         <input type="submit" value="Submit">
     </form>
 
-
-    <h3>Read (GET)</h3>
-    <a href="/databasePull">/databasePull</a><br>
-    <a href="/home">/home</a><br>
-    <a href="/text">/text</a><br>
-
-    <h3>Update (PUT)</h3>
-    <form id="form2" action="/confirmation">
-        <label for="fname">First name:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <label for="lname">Change Last Name To:</label><br>
-        <input type="text" id="lname" name="lname">
+    <!--Update Data Title-->
+    <h3>Update Data Title</h3>
+    <form id="updateSKUentryTitle" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="skuEntry">Updated Entry Title:</label><br>
+        <input type="text" id="updatedTitle" name="updatedTitle"><br>
         <input type="submit" value="Submit">
     </form>
 
-    <h3>Delete (DELETE)</h3>
-    <form id="form3" action="/confirmation">
-        <label for="fname">Enter First Name - Delete Name:</label><br>
-        <input type="text" id="fname" name="fname"><br>
+    <!--Update Data Entry-->
+    <h3>Update Data Entry</h3>
+    <form id="updateSKUentry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="skuEntry">Entry:</label><br>
+        <input type="text" id="skuEntry" name="skuEntry"><br>
         <input type="submit" value="Submit">
     </form>
+
+    <!--Delete SKU Data-->
+    <h3>Delete SKU Data</h3>
+    <form id="deleteSKUentry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="entry">Title of Entry to Delete:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h3>Database Pull</h3>
+    <a href="/databasePull">Full Database</a><br>
 
   </body>
-
-
-
-
-
-
 
   <script>
     //Front End Requests - Form Handlers:
     //1. Add 'submit' Event Listener to Form - use event.preventDefault() to cancel action="url" if needed
-    //2. Give it an async-await function
+    //2. Give it an async-await function (same as the standalone function)
     //3. Now you can grab the form data (the entries) by using FormData class
     //4. Create a response variable that is await for the fetch value of this forms counter part on the backend
     //5. Send FormData parameters to the backend in the fetch request - handle request on the backend by it's specific url
@@ -129,7 +110,7 @@
     //7. Fetch args accept the url path, and url parameters, including but not limited to method (GET,POST,PUT,DELETE), body (what your sending to backend), and headers (just the header for the content, can be text, html, etc)
     //8. It appears as though form requests do not elicit a write response from the server, rather they will only go to the action= url
 
-   //-----------------Front End Request: Create New Sku --------------------
+   //---------------Front End Request: Create New Sku --------------------
    const newSkuForm = document.getElementById('addNewSku');  
    newSkuForm.addEventListener('submit', async (event)=> {
     //event.preventDefault();
@@ -137,83 +118,83 @@
     const response = await fetch ('/newSKU', {  
       method: 'POST', 
       body: new URLSearchParams(formData),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     })
    })
 
+   //-------------Front End Request: Delete SKU --------------------
+   const deleteSKU = document.getElementById('deleteSKU');  
+   deleteSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(deleteSKU);
+    const response = await fetch ('/deleteSKU', {  
+      method: 'DELETE', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
 
+   //-------------Front End Request: Change SKU Name --------------------
+   const changeSKU = document.getElementById('changeSKU');  
+   changeSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(changeSKU);
+    const response = await fetch ('/changeSKU', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+   
+   //----------------Front End Request: Add Sku Entry --------------------
+   const addEntryForm = document.getElementById('addSkuEntry');  
+   addEntryForm.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(addEntryForm);
+    const response = await fetch ('/addEntry', {  
+      method: 'POST', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
 
+   //-------------Front End Request: Update Sku Data:Title --------------------
+   const updateSKUentryTitle = document.getElementById('updateSKUentryTitle');  
+   updateSKUentryTitle.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(updateSKUentryTitle);
+    const response = await fetch ('/updateTitle', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
 
+   //-------------Front End Request: Update Sku Entry --------------------
+   const updateSKUentry = document.getElementById('updateSKUentry');  
+   updateSKUentry.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(updateSKUentry);
+    const response = await fetch ('/updateEntry', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
 
+   //-------------Front End Request: Delete Sku Entry --------------------
+   const deleteSKUentry = document.getElementById('deleteSKUentry');  
+   deleteSKUentry.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(deleteSKUentry);
+    const response = await fetch ('/deleteData', {  
+      method: 'DELETE', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
 
-
-
-
-
-
-    //fetching html content from server
-    // fetch("http://localhost:5001/home")
-    //     .then(response => response.text())
-    //     .then(html => console.log(html))
-    //     .catch(error => console.error('Error:', error));
-
-
-    //fetching data from server
-    // fetch("http://localhost:5001/text=1")
-    //     .then(response => response.json())
-    //     .then(data => console.log(data))
-    //     .catch(error => console.error('Error:', error));
-
-
-
-    //using async/await with fetch
-    async function getHome(){
-      try{
-        const response = await fetch("/home");
-        if (response.ok){
-            const text = await response.text();
-            console.log(text);
-            //inserting response into the html dom
-            const element = document.getElementById('test');
-            element.innerHTML = text;
-        } 
-        else{
-            throw new Error('Failed to fetch data');
-        }
-      }
-      catch (error){
-        console.log('Error:', error);
-      }
-    }
-    getHome();
-
-    //another fetch request that pulls manually made data:
-    async function getText(){
-      try{
-        const response = await fetch("/text");
-        if (response.ok){
-            const text = await response.text();
-            console.log(text);
-            //inserting response into the html dom
-            const element = document.getElementById('text');
-            element.innerHTML = text;
-        } 
-        else{
-            throw new Error('Failed to fetch data');
-        }
-      }
-      catch (error){
-        console.log('Error:', error);
-      }
-    }
-    getText();
-
-
-    //READ
-    //another fetch request, but pulling data from database this time
-    async function getData(){
+   async function getData(){
       try{
         const response = await fetch("/databasePull");
         if (response.ok){
@@ -240,126 +221,6 @@
       }
     }    
    getData();
-
-   //CREATE 
-   //sending the form data HERE instead of in the FORM in order to access the FormData values
-   const form = document.getElementById('form');  
-    
-   form.addEventListener('submit', async (event)=> {
-    //event.preventDefault();
-
-    const formData = new FormData(form);
-
-    const response = await fetch ('/', {  //uses await just like the other fetch functions
-      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
-      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
-      }
-    })
-    //const data = await response.text();
-    //alert(data);
-   })
-
-   //PUT
-   const form2 = document.getElementById('form2');
-   form2.addEventListener('submit', async (event) =>{
-    const formData2 = new FormData(form2);
-    const response2 = fetch ('/', {
-      method: 'PUT',
-      body: new URLSearchParams(formData2),
-      headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
-    })
-   })
-
-   //DELETE
-   const form3 = document.getElementById('form3');
-   form3.addEventListener('submit', async (event) =>{
-    const formData = new FormData(form3);
-    const response = fetch ('/', {
-      method: 'DELETE',
-      body: new URLSearchParams(formData),
-      headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
-    })
-   })
-
-
-
-
-    //CREATE - add data to existing SKU
-   //sending the form data HERE instead of in the FORM in order to access the FormData values
-   const formAdd = document.getElementById('formAdd');  
-    
-   formAdd.addEventListener('submit', async (event)=> {
-    //event.preventDefault();
-
-    const formData = new FormData(formAdd);
-
-    const response = await fetch ('/skuAdd', {  //uses await just like the other fetch functions
-      method: 'POST', //the method is POST, so you are not GETTING anything here, you are mimicking the form itself - method must be GET, POST, PUT, DELETE or PATCH, nothing else or error!!
-      body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
-      }
-    })
-    //const data = await response.text();
-   })
-
-
-   //DELETE SKU
-   const formDelete = document.getElementById('formDelete');  
-    
-    formDelete.addEventListener('submit', async (event)=> {
-     //event.preventDefault();
- 
-     const formData = new FormData(formDelete);
- 
-     const response = await fetch ('/skuDelete', {  //uses await just like the other fetch functions
-       method: 'DELETE', 
-       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
-       headers: {
-         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
-       }
-     })
-     //const data = await response.text();
-    })
-
-    //CHANGE ALREADY EXISTING SKU ENTRY
-    const formChangeEntry = document.getElementById('formChangeEntry');  
-    
-    formChangeEntry.addEventListener('submit', async (event)=> {
-     //event.preventDefault();
- 
-     const formData = new FormData(formChangeEntry);
- 
-     const response = await fetch ('/skuUpdateEntry', {  //uses await just like the other fetch functions
-       method: 'PUT', 
-       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
-       headers: {
-         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
-       }
-     })
-     //const data = await response.text();
-    })
-
-
-    //CHANGE ALREADY EXISTING SKU NAME
-    const formChangeSKU = document.getElementById('formChangeSKU');  
-    
-    formChangeSKU.addEventListener('submit', async (event)=> {
-     //event.preventDefault();
- 
-     const formData = new FormData(formChangeSKU);
- 
-     const response = await fetch ('/skuChangeName', {  //uses await just like the other fetch functions
-       method: 'PUT', 
-       body: new URLSearchParams(formData), //the info your transmitting, can be anything ! / URLSearchParams allows you to easily access, modify, and manipulate the parameters in a URL's query string without having to parse the string manually
-       headers: {
-         'Content-Type': 'application/x-www-form-urlencoded'//this can simply be text or html, it's just the header for content type
-       }
-     })
-     //const data = await response.text();
-    })
 
   </script>
 </html>
