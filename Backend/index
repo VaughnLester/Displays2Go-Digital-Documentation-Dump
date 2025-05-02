@@ -109,7 +109,7 @@ switch(url){
         const jsonObject = JSON.parse(jsonString);
         const addEntrySKU = jsonObject.sku;
         const addEntryTitle = jsonObject.title;
-        const addEntryEntry = jsonObject.entry;
+        const addEntryEntry = jsonObject.skuEntry;
         connection.query(`INSERT INTO ${addEntrySKU} (Title, Entry) VALUES ("${addEntryTitle}", "${addEntryEntry}")`, (err, results) =>{
             if (err) {console.log(err); return;}
             else {console.log(`${addEntryTitle} added to ${addEntrySKU}!`);}
@@ -191,26 +191,23 @@ switch(url){
 
     //Server response: Show all SKUs
     case '/databasePull':
-        connection.query('SHOW TABLES;', (err,results) =>{ //First create SQL query
-        if (err){ //handle error
-        response.writeHead(200, {
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        response.end('error fetching data');
-        return;
+        connection.query('SHOW TABLES;', (err,results) =>{ 
+        if (err){ 
+            response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            response.end('error fetching data');
+            return;
         }
-        response.writeHead(200, { //Then respond with SQL query results 
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});//enables CORS
-        jsonString = JSON.stringify(results);
-        jsonObject = JSON.parse(jsonString);
-        console.log(jsonObject.length);
-    
-        fname = jsonObject[0].idTest;
-        lname = jsonObject[0].text;
-        response.write(readTables(jsonObject));
-        response.write('<br><a href="/thehomepagebecausethisisnotfound">Home Page</a><br>')
-        response.end();
+        else{
+            response.writeHead(200, { 
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            jsonString = JSON.stringify(results);
+            jsonObject = JSON.parse(jsonString);
+            response.write(readTables(jsonObject));
+            response.end();
+            }
         });
     break;
 }
@@ -232,7 +229,21 @@ response.end(content);
 })
 }
 
-
+//Server respone: Serves the database.html page, which shows entire database
+else if (parsedUrl.pathname == "/database"){
+    response.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin' : '*'});//enables CORS
+    fs.readFile('database.html', function(err,content){
+    if(err){
+    console.log(err);
+    response.end;
+    }
+    else{
+    response.end(content);
+    }
+    })
+}
 
 
 //function :
@@ -241,7 +252,8 @@ function readRows(arr){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
-    results += `${arr[max].idTest} ${arr[max].text}, `
+    results += `${arr[max].Title}: ${arr[max].Entry}, `
+    results += `\n`
     max--;
     }
     return results;
@@ -283,12 +295,13 @@ response.end();
 
 
 
+
 //--------------------------------------------------------
 //DISPLAYS ALL SKUS
 //GET
 //ROUTE: /databasePull (responds with database query (SELECT))
 //SQL QUERIES RETURN AN ARRAY, NOT A JSON OBJECT!!! must use array [0] and then the json notation -> .text
-    else if (url == "/databasePull"){
+else if (url == "/databasePull"){
     connection.query('SHOW TABLES;', (err,results) =>{ //First create SQL query
     if (err){ //handle error
     response.writeHead(200, {
@@ -297,9 +310,10 @@ response.end();
     response.end('error fetching data');
     return;
     }
-    response.writeHead(200, { //Then respond with SQL query results 
-    'Content-Type': 'text/html',
-    'Access-Control-Allow-Origin' : '*'});//enables CORS
+    //headers already sent from /database 
+    // response.writeHead(200, { //Then respond with SQL query results 
+    // 'Content-Type': 'text/html',
+    // 'Access-Control-Allow-Origin' : '*'});//enables CORS
     jsonString = JSON.stringify(results);
     jsonObject = JSON.parse(jsonString);
     console.log(jsonObject.length);
@@ -311,8 +325,6 @@ response.end();
     response.end();
     });
     } 
-
-
 
 
 
@@ -350,7 +362,8 @@ else if (parsedUrl.pathname == "/table"){
         console.log("Table request Successful!");
         jsonString = JSON.stringify(results)
         jsonObject = JSON.parse(jsonString)
-        response.end("Table Name: " + tableName + readRows(jsonObject));
+        console.log((`Table Name: ${tableName} \n${readRows(jsonObject)}`));
+        response.end(`Table Name: ${tableName} \n${readRows(jsonObject)}`);
         }
         })
         })

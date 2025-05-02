@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1 id="databasePull"> Full Database: </h1><br><br>
+        <a href="/unknown">Home</a>
+
+    </body>
+    <script>
+        //Normal async - await function 
+        //1. Grabs data from backend
+        //2. Displays it on the frontend (with any manipulation)
+        async function getData(){
+            try{
+                const response = await fetch("/databasePull");
+                if (response.ok){
+                    const text = await response.text();
+                    const element = document.getElementById('databasePull');
+                    textArray = text.split(",");
+                    // element.innerHTML = textArray[1];
+                    //attaching each table name to the dom and adding link
+                    textArray.forEach( function(table){
+                        let x = document.createElement('a');
+                        x.setAttribute('href', `http://localhost:5001/table?name=${table}`);
+                        x.textContent = table;
+                        element.appendChild(x);
+                    }) 
+                
+                } 
+                else{
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }    
+    getData();
+    </script>
+
+
+</html>
