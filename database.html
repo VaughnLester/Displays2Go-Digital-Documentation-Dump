@@ -20,7 +20,7 @@
                     //attaching each table name to the dom and adding link
                     textArray.forEach( function(table){
                         let x = document.createElement('a');
-                        x.setAttribute('href', `http://localhost:5001/table?name=${table}`);
+                        x.setAttribute('href', `/table?name=${table}`);
                         x.textContent = table;
 
                         const listItem = document.createElement('li');
