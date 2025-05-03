@@ -377,11 +377,6 @@ else if (parsedUrl.pathname == "/table"){
         console.log("Table request Successful!");
         jsonString = JSON.stringify(results)
         jsonObject = JSON.parse(jsonString)
-        const array1 = ["hi","hello"];
-        console.log(jsonString);
-        console.log(jsonObject);
-        console.log(jsonObject[0].toString())
-        console.log((`Table Name: ${tableName} \n${readRows(jsonObject)}`));
         //returns the entire HTML page
         //here, the readRows function filters through the jsonObject parameters and ADDS <li></li> HTML to each section!
         //From there, the function is used directly in the HTML code to manipulate it properly on the HTML page to be returned!
