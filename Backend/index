@@ -245,6 +245,22 @@ else if (parsedUrl.pathname == "/database"){
     })
 }
 
+//Server respone: Serves the skuDetails.html page, which shows single SKU page
+else if (parsedUrl.pathname == "/skuDetails"){
+    response.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin' : '*'});//enables CORS
+    fs.readFile('skuDetails.html', function(err,content){
+    if(err){
+    console.log(err);
+    response.end;
+    }
+    else{
+    response.end(content);
+    }
+    })
+}
+
 
 //function :
 //grab data from each row in database
@@ -252,8 +268,7 @@ function readRows(arr){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
-    results += `${arr[max].Title}: ${arr[max].Entry}, `
-    results += `\n`
+    results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
     max--;
     }
     return results;
@@ -362,8 +377,46 @@ else if (parsedUrl.pathname == "/table"){
         console.log("Table request Successful!");
         jsonString = JSON.stringify(results)
         jsonObject = JSON.parse(jsonString)
+        const array1 = ["hi","hello"];
+        console.log(jsonString);
+        console.log(jsonObject);
+        console.log(jsonObject[0].toString())
         console.log((`Table Name: ${tableName} \n${readRows(jsonObject)}`));
-        response.end(`Table Name: ${tableName} \n${readRows(jsonObject)}`);
+        //returns the entire HTML page
+        //here, the readRows function filters through the jsonObject parameters and ADDS <li></li> HTML to each section!
+        //From there, the function is used directly in the HTML code to manipulate it properly on the HTML page to be returned!
+        //WARNING - The variables created outsided the manually written HTML cannot be accessed in the SCRIPT of the manually written HTML, but can be accessed in the BODY of the manually written HTML!
+        response.end(`    
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Display Array</title>
+</head>
+<body>
+  <h1>${tableName}</h1>
+  <ul id="myList2"></ul>
+  ${readRows(jsonObject)} 
+
+
+  <script>
+
+  const myArray =     ["apple", "banana", "cherry", "date"]
+
+
+  const listElement = document.getElementById("myList");
+  let listItems = "";
+
+  for (let i = 0; i < myArray.length; i++) {
+    listItems += "<li>" + myArray[i] + "</li>";
+  }
+
+  listElement.innerHTML = listItems;
+  </script>
+</body>
+</html>
+
+        `);
         }
         })
         })

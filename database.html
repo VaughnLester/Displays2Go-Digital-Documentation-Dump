@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <h1 id="databasePull"> Full Database: </h1><br><br>
+        <ul id="databaseList">Full Database:</ul>
         <a href="/unknown">Home</a>
 
     </body>
@@ -14,7 +14,7 @@
                 const response = await fetch("/databasePull");
                 if (response.ok){
                     const text = await response.text();
-                    const element = document.getElementById('databasePull');
+                    const element = document.getElementById('databaseList');
                     textArray = text.split(",");
                     // element.innerHTML = textArray[1];
                     //attaching each table name to the dom and adding link
@@ -22,7 +22,13 @@
                         let x = document.createElement('a');
                         x.setAttribute('href', `http://localhost:5001/table?name=${table}`);
                         x.textContent = table;
-                        element.appendChild(x);
+
+                        const listItem = document.createElement('li');
+                        listItem.appendChild(x);
+                        element.appendChild(listItem);
+
+
+                        //element.appendChild(x);
                     }) 
                 
                 } 
