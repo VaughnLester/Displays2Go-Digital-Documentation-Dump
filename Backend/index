@@ -3,6 +3,11 @@ const mysql = require('mysql2');
 const urlParsing = require('url'); 
 const fs = require('fs'); 
 const querystring = require('node:querystring');
+const formidable = require('formidable');
+const { Blob } = require('buffer');
+const path = require('path');
+const { Buffer } = require('node:buffer');
+const FileReader = require('FileReader');
 
 const server = http.createServer((request, response)=>{
     const url = request.url;
@@ -30,6 +35,107 @@ const server = http.createServer((request, response)=>{
             response.end();
         });
     }
+
+
+    //saving file to database as blob 
+    else if (url == "/upload"){
+        
+        const form = new formidable.IncomingForm();
+        form.parse(request, (err, fields, files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end("error parsing the file"); return;}
+            
+            const file = files.filetoupload;
+            const filename = "Hello World!.txt";
+            const filepath = path.join(__dirname, 'uploads', filename);
+            console.log("file is here: " +file);
+            console.log("file path is here: "+filepath);
+
+            if(!file){
+                response.end("no file uploaded");
+                return;
+            }
+
+            fs.readFile('C:\\Users\\vaugh\\AppData\\Local\\Temp\\nfwpb7ozqhoap6pub8tmjnimo', (err,data) => {
+                if(err){response.end("error reading the file"); console.log(err);return;}
+
+                const sql = 'INSERT INTO files (filename, data) VALUES (?, ?)';
+                connection.query(sql, [ filepath, data], (err, results)=>{
+                    if(err){response.end("error saving file to database"); console.log(err); return;}
+
+                    response.end("file uploaded and saved to database");
+                });
+            })
+        })
+    }
+//to read the blob file 
+    else if (url == "/read"){
+        // response.writeHead(200, {  
+        // 'Content-Type': 'text/html',
+        // 'Access-Control-Allow-Origin' : '*'});
+        connection.query(`SELECT * FROM files`, (err, results) =>{
+        if (err) {console.log(err); return;}
+        else {
+            // // console.log(results);
+            // // console.log(results.data); 
+            // // console.log(results[0]);
+            // console.log(results[0].data); //this one pulls the data 
+            // console.log(Buffer);
+            // const x = Buffer.from(results[0].data);
+            // console.log(Buffer.from(results[0].data))
+            // fs.readFile(x, (err, data) => {
+            //     if (err) {
+            //         console.log(err);
+            //         response.end(err);
+            //         return;
+            //     }
+            //     response.end(data);
+            // });         
+
+
+            //confirm the pdf file is saving fine, then see why it's not OPENING (sent to browser) fine
+                async function convertBlobToPdf(blob, filePath) {
+                try {
+                    const arrayBuffer = await blob.arrayBuffer();
+                    const buffer = Buffer.from(arrayBuffer);
+                    response.setHeader('Content-Type', blob.type);
+                    response.setHeader('Content-Disposition', `inline; filename="my PDF File"`);
+                    response.end();
+
+                    fs.writeFileSync(filePath, buffer);
+                    console.log(`PDF file saved to ${filePath}`);
+                } catch (error) {
+                    console.error('Error converting Blob to PDF:', error);
+                }
+                }
+
+            async function example() {
+            // Simulate a Blob (replace with your actual Blob data)
+                const blobData = new Uint8Array(results[0].data);
+                const blob = new Blob([blobData], { type: 'application/pdf' });
+            
+            const pdfFilePath = 'output.pdf';
+            await convertBlobToPdf(blob, pdfFilePath);
+            }
+            example();
+
+        }})
+    }
+
+    // else if (url == "/blob"){
+    //         response.writeHead(200, {  
+    //     'Content-Type': 'text/html',
+    //     'Access-Control-Allow-Origin' : '*'});
+    //     connection.query("SELECT data FROM files", (err,results) =>{
+    //         if (err){console.log(err); return;}
+    //         else {
+    //                             console.log(results);
+    //             console.log(JSON.parse(JSON.stringify(results)));
+    //             response.end(JSON.parse(JSON.stringify(results)));}
+    //     })
+    // }
 
     else if (url == "/deleteSKU"){
         let body = '';
@@ -234,13 +340,11 @@ const server = http.createServer((request, response)=>{
                     ${readRows(jsonObject)} 
                 </body>
                 <script>
-                    const myArray =     ["apple", "banana", "cherry", "date"]
-                    const listElement = document.getElementById("myList");
-                    let listItems = "";
-                    for (let i = 0; i < myArray.length; i++) {
-                    listItems += "<li>" + myArray[i] + "</li>";
-                    }
-                    listElement.innerHTML = listItems;
+
+
+
+
+                    
                 </script>
             </html>`);
         }})})
@@ -276,13 +380,20 @@ connection.connect(function(err){
 //connecting server
 server.listen(5001, console.log("server is listening on 5001"));
 
+
+//-------------------------------------------------------------------
 //functions used:
 //grab data from each row in database, add list item HTML
 function readRows(arr){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
-    results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+    //normal line for all sku table, temp disabled for testing
+    //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+    
+    //new line for testing file table - temp testing
+    results += 
+    `<li>${arr[max].filename}: ${arr[max].data}</li>`
     max--;
     }
     return results;
@@ -299,3 +410,21 @@ function readTables(arr){
     }
     return results;
 }
+
+async function convertBlobToPdf(blobData) {
+    try {
+    const buffer = Buffer.from(await blobData.arrayBuffer());
+
+    fs.writeFileSync("new file path", buffer);
+    console.log("PDF file saved");
+    } catch (error) {
+    console.error('Error converting Blob to PDF:', error);
+    }
+}      
+
+
+    const data = 'Hello, Blob!';
+    const blob = new Blob([data], { type: 'text/plain' });
+    console.log(blob);
+
+

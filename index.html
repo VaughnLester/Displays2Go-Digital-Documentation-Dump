@@ -21,6 +21,12 @@
     <!--Action= sends the form to a url after submitting usually, but here I have added a custom submit button event to each form to do even more-->
     <!--Reminder: Add error handling to all forms! and on backend too!-->
 
+    <!--Form to upload files/docs to database-->
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="filetoupload"><br>
+        <input type="submit">
+    </form>
+
     <!--Create New SKU-->
     <h3>Add SKU To Database (Must not have spaces)</h3>
     <form id="addNewSku" action="/confirmation">
@@ -193,6 +199,35 @@
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     })
    })
+
+
+//    fetch('/blob', {
+//   method: 'GET',
+//   responseType: 'blob',
+// })
+//   .then(response => response.blob())
+//   .then(blob => {
+//     console.log("response received");
+//     blobToPdf(blob, 'my-document.pdf');
+//   });
+
+const bufferData = Buffer.from({ size: 12, type: 'text/plain' });
+console.log(bufferData);
+
+   function blobToPdf(blob, filename = 'document.pdf') {
+    alert("in pdf function");
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+//blobToPdf({ size: 12, type: 'text/plain' }, "new file");
+
 
   </script>
 </html>
