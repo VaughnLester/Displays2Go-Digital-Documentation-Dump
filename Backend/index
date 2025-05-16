@@ -48,21 +48,26 @@ const server = http.createServer((request, response)=>{
             if(err){response.end("error parsing the file"); return;}
             
             const file = files.filetoupload;
-            const filename = "Hello World!.txt";
-            const filepath = path.join(__dirname, 'uploads', filename);
+            const filename = "example.txt";
+            const filepath = path.join(__dirname,  filename);
             console.log("file is here: " +file);
-            console.log("file path is here: "+filepath);
+            console.log("file path is here: "+ filepath);
+            console.log(process.cwd());
 
             if(!file){
                 response.end("no file uploaded");
                 return;
             }
 
-            fs.readFile('C:\\Users\\vaugh\\AppData\\Local\\Temp\\nfwpb7ozqhoap6pub8tmjnimo', (err,data) => {
+            fs.readFile
+            //uploading a file starts here: must read the file first, getting it's contents, then you insert the file contnent as BLOB data into the database. But if you can't find the correct file path, which is step one, you cannot upload
+            (process.cwd() + "/example.txt", 
+                //this should be whatever file you actually upload, not a manually added path (this is just temporary). This is what is causing problems, we're unable to acquire the correct file path from the file you are uploading!! MUST fix!!
+                (err,data) => {
                 if(err){response.end("error reading the file"); console.log(err);return;}
 
                 const sql = 'INSERT INTO files (filename, data) VALUES (?, ?)';
-                connection.query(sql, [ filepath, data], (err, results)=>{
+                connection.query(sql, [ filename, data], (err, results)=>{
                     if(err){response.end("error saving file to database"); console.log(err); return;}
 
                     response.end("file uploaded and saved to database");
@@ -95,31 +100,21 @@ const server = http.createServer((request, response)=>{
             // });         
 
 
-            //confirm the pdf file is saving fine, then see why it's not OPENING (sent to browser) fine
-                async function convertBlobToPdf(blob, filePath) {
-                try {
-                    const arrayBuffer = await blob.arrayBuffer();
-                    const buffer = Buffer.from(arrayBuffer);
-                    response.setHeader('Content-Type', blob.type);
-                    response.setHeader('Content-Disposition', `inline; filename="my PDF File"`);
-                    response.end();
+            //it works!! it saves the file CORRECTLY and you can OPEN the file CORRECTLY. Now you just have to convert it PDF instead of txt, and make it AUTO open, not just download like it does now!!! ************
+async function blobToFile(blob, fileName) {
+  const arrayBuffer = await blob.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  fs.writeFileSync(fileName, buffer);
+}
 
-                    fs.writeFileSync(filePath, buffer);
-                    console.log(`PDF file saved to ${filePath}`);
-                } catch (error) {
-                    console.error('Error converting Blob to PDF:', error);
-                }
-                }
+async function example() {
+  const blob = new Blob([results[0].data], { type: "text/plain" });
+  const fileName = "fromDatabase.txt";
+  await blobToFile(blob, fileName);
+  console.log(`File "${fileName}" created successfully.`);
+}
 
-            async function example() {
-            // Simulate a Blob (replace with your actual Blob data)
-                const blobData = new Uint8Array(results[0].data);
-                const blob = new Blob([blobData], { type: 'application/pdf' });
-            
-            const pdfFilePath = 'output.pdf';
-            await convertBlobToPdf(blob, pdfFilePath);
-            }
-            example();
+example();
 
         }})
     }
