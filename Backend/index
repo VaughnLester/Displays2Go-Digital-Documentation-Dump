@@ -100,16 +100,19 @@ const server = http.createServer((request, response)=>{
             // });         
 
 
-            //it works!! it saves the file CORRECTLY and you can OPEN the file CORRECTLY. Now you just have to convert it PDF instead of txt, and make it AUTO open, not just download like it does now!!! ************
+            //it works!! it saves the file CORRECTLY and you can OPEN the file CORRECTLY. And now it OPENS the file directly in the BROWSER as a txt file currently !!!
+            //Now test on .doc, .pdf, and IMAGE files!!! BIG FILES!!
 async function blobToFile(blob, fileName) {
   const arrayBuffer = await blob.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  fs.writeFileSync(fileName, buffer);
+  fs.readFileSync(fileName, buffer); //this reads the file 
+  response.end(buffer); //this returns/opens the file data straight in the browser!! Even as .txt!!
+  //fs.writeFileSync(fileName, buffer); //this saves the file in currecnt directory
 }
 
 async function example() {
-  const blob = new Blob([results[0].data], { type: "text/plain" });
-  const fileName = "fromDatabase.txt";
+  const blob = new Blob([results[0].data], { type: "application/pdf" });
+  const fileName = "fromDatabase.pdf";
   await blobToFile(blob, fileName);
   console.log(`File "${fileName}" created successfully.`);
 }
