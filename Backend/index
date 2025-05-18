@@ -48,11 +48,11 @@ const server = http.createServer((request, response)=>{
             if(err){response.end("error parsing the file"); return;}
             
             const file = files.filetoupload;
-            const filename = "example.txt";
+            const filename = "Image test";
             const filepath = path.join(__dirname,  filename);
             console.log("file is here: " +file);
-            console.log("file path is here: "+ filepath);
-            console.log(process.cwd());
+            //start by fixing file path when trying to upload a file from your system!
+            console.log("The correct file path that works: " + process.cwd()) + "/shutterstock_85875151.webp";
 
             if(!file){
                 response.end("no file uploaded");
@@ -61,7 +61,7 @@ const server = http.createServer((request, response)=>{
 
             fs.readFile
             //uploading a file starts here: must read the file first, getting it's contents, then you insert the file contnent as BLOB data into the database. But if you can't find the correct file path, which is step one, you cannot upload
-            (process.cwd() + "/example.txt", 
+            (process.cwd() + "/shutterstock_85875151.webp", //you need to grab this automatically, not be entering it manually!!
                 //this should be whatever file you actually upload, not a manually added path (this is just temporary). This is what is causing problems, we're unable to acquire the correct file path from the file you are uploading!! MUST fix!!
                 (err,data) => {
                 if(err){response.end("error reading the file"); console.log(err);return;}
@@ -101,7 +101,8 @@ const server = http.createServer((request, response)=>{
 
 
             //it works!! it saves the file CORRECTLY and you can OPEN the file CORRECTLY. And now it OPENS the file directly in the BROWSER as a txt file currently !!!
-            //Now test on .doc, .pdf, and IMAGE files!!! BIG FILES!!
+            //AND now I have test pdf files, AND image files, BIG files, and they all WORK.
+            //Now we need to clean up, and streamline the process, becasue EVERYTHING is now working for full digital documentation!!!!
 async function blobToFile(blob, fileName) {
   const arrayBuffer = await blob.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
