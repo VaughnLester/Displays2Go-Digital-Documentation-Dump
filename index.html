@@ -21,8 +21,10 @@
     <!--Action= sends the form to a url after submitting usually, but here I have added a custom submit button event to each form to do even more-->
     <!--Reminder: Add error handling to all forms! and on backend too!-->
 
-    <!--Form to upload files/docs to database-->
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <!--Form to upload files/docs to database, event listener is attached to this-->
+    <form id="formUpload" action="/upload" method="post" enctype="multipart/form-data">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
         <input type="file" name="filetoupload"><br>
         <input type="submit">
     </form>
@@ -116,7 +118,19 @@
     //7. Fetch args accept the url path, and url parameters, including but not limited to method (GET,POST,PUT,DELETE), body (what your sending to backend), and headers (just the header for the content, can be text, html, etc)
     //8. It appears as though form requests do not elicit a write response from the server, rather they will only go to the action= url
 
-   //---------------Front End Request: Create New Sku --------------------
+//    //---------------Front End Request: --------------------
+//    const formUpload = document.getElementById('formUpload');  
+//    newSkuForm.addEventListener('submit', async (event)=> {
+//     //event.preventDefault();
+//     const formData = new FormData(formUpload);
+//     const response = await fetch ('/upload', {  
+//       method: 'POST', 
+//       body: new URLSearchParams(formData),
+//       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//     })
+//    })
+   
+    //---------------Front End Request: Create New Sku --------------------
    const newSkuForm = document.getElementById('addNewSku');  
    newSkuForm.addEventListener('submit', async (event)=> {
     //event.preventDefault();

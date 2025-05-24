@@ -29,30 +29,45 @@ const server = http.createServer((request, response)=>{
         const jsonString = JSON.stringify(parsedData);
         const jsonObject = JSON.parse(jsonString);
         const newSKU = jsonObject.sku
-        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, PRIMARY KEY (entryID));`, (err, results) =>{
+        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
             if (err) {console.log(err); return;}
             else {console.log(`${newSKU} added to database!`);}})
             response.end();
         });
     }
 
-
+    
     //saving file to database as blob 
     else if (url == "/upload"){
+        //must fix this so you can get the data sent for the SKU AND THE FILE itself
+         let body = '';
+         request.on('data', chunk => {
+         body += chunk;
+         });
+        // const parsedData = querystring.parse(body);
+        // console.log(`${JSON.stringify(parsedData)}`);
+
+        //  request.on('end', () => {
+        // const parsedData = querystring.parse(body);
+        // console.log(`${JSON.stringify(parsedData)}`);
+        // });
         
-        const form = new formidable.IncomingForm();
+        const form = new formidable.IncomingForm(); //really good and easy to use for handling form data!! maybe use this for ALL of your FORMS!! works with file upload and NON file upload FORMS!! regular body-parser does NOT work with file upload forms!!!
         form.parse(request, (err, fields, files)=>{
             response.writeHead(200, {  
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end("error parsing the file"); return;}
-            
+            const skuTable = fields.sku[0];
+            console.log('The sku: ', fields.sku[0]);
             const file = files.filetoupload;
-            const filename = "Image test";
-            const filepath = path.join(__dirname,  filename);
-            console.log("file is here: " +file);
-            //start by fixing file path when trying to upload a file from your system!
-            console.log("The correct file path that works: " + process.cwd()) + "/shutterstock_85875151.webp";
+            const filename = file[0].originalFilename;
+            const filepath = file[0].filepath;
+            // //console.log("file is here: " +file);
+            // //start by fixing file path when trying to upload a file from your system!
+            // console.log(file[0].filepath); //the correct generated file path
+            // // console.log(files.filetoupload);
+            // // console.log("The correct file path that works: " + process.cwd() + "/" + files.filetoupload[0].originalFilename);
 
             if(!file){
                 response.end("no file uploaded");
@@ -61,16 +76,15 @@ const server = http.createServer((request, response)=>{
 
             fs.readFile
             //uploading a file starts here: must read the file first, getting it's contents, then you insert the file contnent as BLOB data into the database. But if you can't find the correct file path, which is step one, you cannot upload
-            (process.cwd() + "/shutterstock_85875151.webp", //you need to grab this automatically, not be entering it manually!!
-                //this should be whatever file you actually upload, not a manually added path (this is just temporary). This is what is causing problems, we're unable to acquire the correct file path from the file you are uploading!! MUST fix!!
+            (filepath, //this works but now you need to get the original path, not process.cwd, because the file can be uploaded from anywhere on the computer ! must find it's path
                 (err,data) => {
                 if(err){response.end("error reading the file"); console.log(err);return;}
 
-                const sql = 'INSERT INTO files (filename, data) VALUES (?, ?)';
+                const sql = `INSERT INTO ${skuTable} (FileName, File) VALUES (?, ?)`;
                 connection.query(sql, [ filename, data], (err, results)=>{
                     if(err){response.end("error saving file to database"); console.log(err); return;}
 
-                    response.end("file uploaded and saved to database");
+                    response.end(`file uploaded to sku ${skuTable} and saved to database`);
                 });
             })
         })
@@ -337,12 +351,9 @@ example();
                     <h1>${tableName}</h1>
                     <ul id="myList2"></ul>
                     ${readRows(jsonObject)} 
+
                 </body>
                 <script>
-
-
-
-
                     
                 </script>
             </html>`);
@@ -383,17 +394,21 @@ server.listen(5001, console.log("server is listening on 5001"));
 //-------------------------------------------------------------------
 //functions used:
 //grab data from each row in database, add list item HTML
+//Now all you have to do is fix this so it pulls files as well
+//1. Pull file name and file data 2. Link file name as text to /read server response. 3. /read picks up the file name, and queries the database for the corresponding file!!
 function readRows(arr){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
     //normal line for all sku table, temp disabled for testing
-    //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+    results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
     
     //new line for testing file table - temp testing
-    results += 
-    `<li>${arr[max].filename}: ${arr[max].data}</li>`
-    max--;
+    // results += 
+    // `<li>${arr[max].filename}: ${arr[max].data}</li>`
+
+
+      max--;
     }
     return results;
 }
