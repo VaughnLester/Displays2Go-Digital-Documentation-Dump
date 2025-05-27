@@ -90,11 +90,19 @@ const server = http.createServer((request, response)=>{
         })
     }
 //to read the blob file 
-    else if (url == "/read"){
+    else if (url.includes("/read")){
         // response.writeHead(200, {  
         // 'Content-Type': 'text/html',
         // 'Access-Control-Allow-Origin' : '*'});
-        connection.query(`SELECT * FROM files`, (err, results) =>{
+        console.log("the url sent here: " + request.url);
+        const url = request.url;
+        //use this to parse request.url to get the variable=value pair in the url!!
+
+        //This works all you have to do now is add it to the SQL query to it pulls the correct table and the correct file!!
+        const params = new URLSearchParams(url);
+        console.log(params.get('table')); //the table name
+        console.log(params.get('filename')); //the file name
+        connection.query(`SELECT File FROM ${params.get('table')} WHERE filename = "${params.get('filename')}"`, (err, results) =>{
         if (err) {console.log(err); return;}
         else {
             // // console.log(results);
@@ -126,10 +134,10 @@ async function blobToFile(blob, fileName) {
 }
 
 async function example() {
-  const blob = new Blob([results[0].data], { type: "application/pdf" });
-  const fileName = "fromDatabase.pdf";
+  const blob = new Blob([results[0].File], { type: "application/pdf" });
+  const fileName = results[0].FileName;
   await blobToFile(blob, fileName);
-  console.log(`File "${fileName}" created successfully.`);
+  console.log(`File "${fileName}" successfully opened in browser!.`);
 }
 
 example();
@@ -350,7 +358,7 @@ example();
                 <body>
                     <h1>${tableName}</h1>
                     <ul id="myList2"></ul>
-                    ${readRows(jsonObject)} 
+                    ${readRows(jsonObject, tableName)} 
 
                 </body>
                 <script>
@@ -394,14 +402,16 @@ server.listen(5001, console.log("server is listening on 5001"));
 //-------------------------------------------------------------------
 //functions used:
 //grab data from each row in database, add list item HTML
-//Now all you have to do is fix this so it pulls files as well
-//1. Pull file name and file data 2. Link file name as text to /read server response. 3. /read picks up the file name, and queries the database for the corresponding file!!
-function readRows(arr){
+
+//Everything works perfectly for uploading files, now just edit so each file has a label that is displayed next to it, which is the descriptive file name - do this first by adding another column to the table for file label, then pulling that column for each file pull and adding it to display with the file name which is already perfectly linked - do not need the file itself to display!!!
+function readRows(arr,sku){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
     //normal line for all sku table, temp disabled for testing
-    results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+    //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+    if (arr[max].File !== null){results += `<li><a href="/read?sku=${sku}&filename=${arr[max].FileName}&table=${sku}">${arr[max].FileName}</a>: ${arr[max].File}</li> `;}
+    else{results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `;}
     
     //new line for testing file table - temp testing
     // results += 
@@ -425,20 +435,6 @@ function readTables(arr){
     return results;
 }
 
-async function convertBlobToPdf(blobData) {
-    try {
-    const buffer = Buffer.from(await blobData.arrayBuffer());
 
-    fs.writeFileSync("new file path", buffer);
-    console.log("PDF file saved");
-    } catch (error) {
-    console.error('Error converting Blob to PDF:', error);
-    }
-}      
-
-
-    const data = 'Hello, Blob!';
-    const blob = new Blob([data], { type: 'text/plain' });
-    console.log(blob);
 
 
