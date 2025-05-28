@@ -9,6 +9,8 @@ const path = require('path');
 const { Buffer } = require('node:buffer');
 const FileReader = require('FileReader');
 
+
+//Everything WORKS, now just test test test and add ERROR HANDLING. THEN CLEAN ALL THE CODE AS YOU MAKE THE FRONTEND LOOK NICEEE!!  
 const server = http.createServer((request, response)=>{
     const url = request.url;
     const method = request.method;
@@ -29,7 +31,8 @@ const server = http.createServer((request, response)=>{
         const jsonString = JSON.stringify(parsedData);
         const jsonObject = JSON.parse(jsonString);
         const newSKU = jsonObject.sku
-        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
+        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255),
+             OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
             if (err) {console.log(err); return;}
             else {console.log(`${newSKU} added to database!`);}})
             response.end();
@@ -59,9 +62,10 @@ const server = http.createServer((request, response)=>{
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end("error parsing the file"); return;}
             const skuTable = fields.sku[0];
+            const filename = fields.originalfileName[0];
             console.log('The sku: ', fields.sku[0]);
             const file = files.filetoupload;
-            const filename = file[0].originalFilename;
+            const originalFilename = file[0].originalFilename;
             const filepath = file[0].filepath;
             // //console.log("file is here: " +file);
             // //start by fixing file path when trying to upload a file from your system!
@@ -80,8 +84,8 @@ const server = http.createServer((request, response)=>{
                 (err,data) => {
                 if(err){response.end("error reading the file"); console.log(err);return;}
 
-                const sql = `INSERT INTO ${skuTable} (FileName, File) VALUES (?, ?)`;
-                connection.query(sql, [ filename, data], (err, results)=>{
+                const sql = `INSERT INTO ${skuTable} (FileName, OriginalFileName, File) VALUES (?, ?, ?)`;
+                connection.query(sql, [filename, originalFilename, data], (err, results)=>{
                     if(err){response.end("error saving file to database"); console.log(err); return;}
 
                     response.end(`file uploaded to sku ${skuTable} and saved to database`);
@@ -102,7 +106,7 @@ const server = http.createServer((request, response)=>{
         const params = new URLSearchParams(url);
         console.log(params.get('table')); //the table name
         console.log(params.get('filename')); //the file name
-        connection.query(`SELECT File FROM ${params.get('table')} WHERE filename = "${params.get('filename')}"`, (err, results) =>{
+        connection.query(`SELECT * FROM ${params.get('table')} WHERE OriginalFileName = "${params.get('filename')}"`, (err, results) =>{
         if (err) {console.log(err); return;}
         else {
             // // console.log(results);
@@ -122,9 +126,7 @@ const server = http.createServer((request, response)=>{
             // });         
 
 
-            //it works!! it saves the file CORRECTLY and you can OPEN the file CORRECTLY. And now it OPENS the file directly in the BROWSER as a txt file currently !!!
-            //AND now I have test pdf files, AND image files, BIG files, and they all WORK.
-            //Now we need to clean up, and streamline the process, becasue EVERYTHING is now working for full digital documentation!!!!
+
 async function blobToFile(blob, fileName) {
   const arrayBuffer = await blob.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
@@ -135,9 +137,10 @@ async function blobToFile(blob, fileName) {
 
 async function example() {
   const blob = new Blob([results[0].File], { type: "application/pdf" });
-  const fileName = results[0].FileName;
+  console.log(results[0].OriginalFileName);
+  const fileName = results[0].OriginalFileName;
   await blobToFile(blob, fileName);
-  console.log(`File "${fileName}" successfully opened in browser!.`);
+  console.log(`File "${fileName}" successfully opened in browser!`);
 }
 
 example();
@@ -410,7 +413,7 @@ function readRows(arr,sku){
     while (max > -1){
     //normal line for all sku table, temp disabled for testing
     //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
-    if (arr[max].File !== null){results += `<li><a href="/read?sku=${sku}&filename=${arr[max].FileName}&table=${sku}">${arr[max].FileName}</a>: ${arr[max].File}</li> `;}
+    if (arr[max].File !== null){results += `<li>${arr[max].FileName}: <a href="/read?sku=${sku}&filename=${arr[max].OriginalFileName}&table=${sku}">${arr[max].OriginalFileName}</a></li> `;}
     else{results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `;}
     
     //new line for testing file table - temp testing
