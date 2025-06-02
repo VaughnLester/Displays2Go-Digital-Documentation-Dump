@@ -10,6 +10,7 @@ const { Buffer } = require('node:buffer');
 const FileReader = require('FileReader');
 
 
+
 //Everything WORKS, now just test test test and add ERROR HANDLING. THEN CLEAN ALL THE CODE AS YOU MAKE THE FRONTEND LOOK NICEEE!!  
 const server = http.createServer((request, response)=>{
     const url = request.url;
@@ -17,36 +18,52 @@ const server = http.createServer((request, response)=>{
     const parsedUrl = urlParsing.parse(url, true)
 
     if (url == "/newSKU"){
-        let body = '';
-        request.on('data', chunk =>{ //using this to grab data from the url because it's needed for the server response.
-        //in request.on , data is the event, each event is triggered differently 
-        //request.on simply adds event listeners to the request, triggered at different events!
-        body += chunk.toString();
-        });
-        request.on('end', ()=>{
-        const parsedData = querystring.parse(body);
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});
-        const jsonString = JSON.stringify(parsedData);
-        const jsonObject = JSON.parse(jsonString);
-        const newSKU = jsonObject.sku
-        connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255),
-             OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
-            if (err) {console.log(err); return;}
-            else {console.log(`${newSKU} added to database!`);}})
-            response.end();
-        });
+        // let body = '';
+        // request.on('data', chunk =>{ //using this to grab data from the url because it's needed for the server response.
+        // //in request.on , data is the event, each event is triggered differently 
+        // //request.on simply adds event listeners to the request, triggered at different events!
+        // body += chunk.toString();
+        // });
+        
+        //using formidable to handle the incoming form
+        //it works perfectly, and properly sends back a response!
+        const form2 = new formidable.IncomingForm(); 
+        form2.parse(request, (err, fields, files) =>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            connection.query(`CREATE TABLE ${fields.sku[0]} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255),
+                OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`${fields.sku[0]} added to database!`);}})
+        })  
+
+        // request.on('end', ()=>{
+        // const parsedData = querystring.parse(body);
+        // response.writeHead(200, {  
+        // 'Content-Type': 'text/html',
+        // 'Access-Control-Allow-Origin' : '*'});
+        // const jsonString = JSON.stringify(parsedData);
+        // const jsonObject = JSON.parse(jsonString);
+        // const newSKU = jsonObject.sku
+        // connection.query(`CREATE TABLE ${newSKU} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255),
+        //      OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
+        // //need to make this properly return the error to the FRONTEND in the same way that /upload server response properly returns error messages to the frontend!! Then you can handle every possible error that might occur from the SQL queries!! Aside from that, everything else is complete! So you can fix this part as you totally clean up the code now!!
+        //     if (err) {console.log(err); return;}
+        //     else {console.log(`${newSKU} added to database!`);}})
+        //     response.end();
+        // });
     }
+
 
     
     //saving file to database as blob 
     else if (url == "/upload"){
         //must fix this so you can get the data sent for the SKU AND THE FILE itself
-         let body = '';
-         request.on('data', chunk => {
-         body += chunk;
-         });
+        //  let body = '';
+        //  request.on('data', chunk => {
+        //  body += chunk;
+        //  });
         // const parsedData = querystring.parse(body);
         // console.log(`${JSON.stringify(parsedData)}`);
 
@@ -88,7 +105,7 @@ const server = http.createServer((request, response)=>{
                 connection.query(sql, [filename, originalFilename, data], (err, results)=>{
                     if(err){response.end("error saving file to database"); console.log(err); return;}
 
-                    response.end(`file uploaded to sku ${skuTable} and saved to database`);
+                    response.end(`${filename} uploaded to sku ${skuTable} and saved to database`);
                 });
             })
         })
