@@ -33,7 +33,7 @@
 
     <!--Only need to add input validation for input that WILL go through succssfully to the databse, but that you do NOT want to be ADDED to the database if you can think of anything you don't want in there (like swear words or a certain amount of characters in each input). Anything that produces an error from the database query will be HANDLED on the BACK end and sent to frontend!!-->
 
-    <!--Keep in mind that method "post" enables the body of the url to send as /newSKU only, and not /newSKU?+parameters which disables the proper response on the backend!!! Therefore you don't even NEED form handlers becasue you're doing the EXACT same thing in the form itself!! The only reason why'd you'd need a seperate form handler is if you're trying to send the form to a different path other than the server response, while still sending it to the server response (2 actions)!-->
+    <!--Keep in mind that method "post" enables the body of the url to send as /newSKU only, and not /newSKU?+parameters which disables the proper response on the backend!!! Therefore you don't even NEED form handlers becasue you're doing the EXACT same thing in the form itself!! The only reason why'd you'd need a seperate form handler is if you're trying to send the form to a different path other than the server response!-->
     <h3>Add SKU To Database (Must not have spaces)</h3>
     <form id="addNewSku" action="/newSKU" method="post">
         <label for="sku">SKU:</label><br>

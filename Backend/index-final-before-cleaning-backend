@@ -12,9 +12,6 @@ const FileReader = require('FileReader');
 
 
 //Everything WORKS, now just test test test and add ERROR HANDLING. THEN CLEAN ALL THE CODE AS YOU MAKE THE FRONTEND LOOK NICEEE!!  
-
-//FIXED WORD DOCS NOT OPENING, NOW THEY SAVE PROPERLY WHEN OPENED!! TESTING IS NOW FINISHED. 
-//NOW CLEAN CODE SLOWLY AND TEST EACH STEP AS YOU CLEAN IT!!
 const server = http.createServer((request, response)=>{
     const url = request.url;
     const method = request.method;
@@ -148,24 +145,12 @@ const server = http.createServer((request, response)=>{
 
 
 
-//REMINDER: YOU CANT OPEN A WORD DOCUMENT IN A BROWSER, YOU HAVE TO SAVE IT IF IT'S WORD - BUT PDF, TXT, IMAGES ETC. CAN OPEN IN BROWSWER!!
 async function blobToFile(blob, fileName) {
   const arrayBuffer = await blob.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-
-  if((fileName.includes(".docx"))){//saves file if it's a word doc
+  fs.readFileSync(fileName, buffer); //this reads the file 
+  response.end(buffer); //this returns/opens the file data straight in the browser!! Even as .txt!!
   //fs.writeFileSync(fileName, buffer); //this saves the file in currecnt directory
-    response.writeHead(200, {
-        "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "Content-Length": Buffer.byteLength(buffer),
-        "Content-disposition": `attachment; filename=${fileName}`
-    });
-  response.end(buffer)
-  }
-  else{//opens file in browser otherwise
-  //fs.readFileSync(fileName, buffer); //this reads the file 
-  response.end(buffer); //this returns/opens the file data straight in the browser!! It MUST be a file that can open in broswer!!!
-  }
 }
 
 async function example() {
