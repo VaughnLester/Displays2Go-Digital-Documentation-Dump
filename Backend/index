@@ -19,7 +19,7 @@ const server = http.createServer((request, response)=>{
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end("Error submitting form: "+err); return;}
-            connection.query(`CREATE TABLE ${fields.sku[0]} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255), Entry varchar(255) NOT NULL, FileName varchar(255),
+            connection.query(`CREATE TABLE ${fields.sku[0]} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255) UNIQUE, Entry varchar(255) NOT NULL, FileName varchar(255) UNIQUE,
                 OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
                 if (err){response.end(err.toString()); return;}
                 else {response.end(`${fields.sku[0]} added to database!`);}
@@ -79,9 +79,9 @@ const server = http.createServer((request, response)=>{
             if(err){response.end("error parsing the file: "+err); return;}
             if(!files.filetoupload){response.end("no file uploaded");return;}
             fs.readFile(files.filetoupload[0].filepath,(err,data) => {
-                if(err){response.end("error reading the file: "+err); console.log(err);return;}
+                if(err){response.end(err.toString()); console.log(err);return;}
                 connection.query(`INSERT INTO ${fields.sku[0]} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
-                    if(err){response.end("error saving file to database"); console.log(err); return;}
+                    if(err){response.end(err.toString()); console.log(err); return;}
                     response.end(`${fields.originalfileName[0]} uploaded to sku ${fields.sku[0]} and saved to database`);
                 });
             })
