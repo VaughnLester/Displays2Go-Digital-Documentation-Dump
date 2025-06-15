@@ -4,7 +4,7 @@
   "description": "My backend ",
   "main": "index",
   "scripts": {
-    "start": "node index", 
+    "start": "node backend", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Vaughn",
