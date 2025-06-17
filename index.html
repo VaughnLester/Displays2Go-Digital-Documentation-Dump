@@ -16,7 +16,7 @@
     <h3>Add SKU To Database (Must not have spaces)</h3>
     <form id="addNewSku" action="/newSKU" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku" pattern="^\S+$" title="No spaces"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -24,7 +24,7 @@
     <h3>Delete SKU</h3>
     <form id="deleteSKU" action="/deleteSKU" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -32,9 +32,9 @@
     <h3>Change SKU Name</h3>
     <form id="changeSKU" action="/changeSKU" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="newSKU">New Name:</label><br>
-        <input type="text" id="newSKU" name="newSKU"><br>
+        <input type="text" id="newSKU" name="newSKU" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -43,11 +43,11 @@
     <h3>Add Data Entry</h3>
     <form id="addSkuEntry" action="/addEntry" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="title">Entry Title:</label><br>
-        <input type="text" id="title" name="title"><br>
+        <input type="text" id="title" name="title" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <label for="skuEntry">Entry:</label><br>
-        <input type="text" id="skuEntry" name="skuEntry"><br>
+        <input type="text" id="skuEntry" name="skuEntry" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -55,9 +55,9 @@
     <h3>Add File To SKU</h3>
     <form id="formUpload" action="/upload" method="post" enctype="multipart/form-data">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="originalfileName">File Name:</label><br>
-        <input type="text" id="originalfileName" name="originalfileName"><br>
+        <input type="text" id="originalfileName" name="originalfileName" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <input type="file" name="filetoupload"><br>
         <input type="submit">
     </form>
@@ -66,11 +66,11 @@
     <h3>Update Data Title</h3>
     <form id="updateSKUentryTitle" action="/updateTitle" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="title">Entry Title:</label><br>
-        <input type="text" id="title" name="title"><br>
+        <input type="text" id="title" name="title" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <label for="skuEntry">Updated Entry Title:</label><br>
-        <input type="text" id="updatedTitle" name="updatedTitle"><br>
+        <input type="text" id="updatedTitle" name="updatedTitle" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -78,11 +78,11 @@
     <h3>Update Data Entry</h3>
     <form id="updateSKUentry" action="/updateEntry" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="title">Entry Title:</label><br>
-        <input type="text" id="title" name="title"><br>
+        <input type="text" id="title" name="title" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <label for="skuEntry">Entry:</label><br>
-        <input type="text" id="skuEntry" name="skuEntry"><br>
+        <input type="text" id="skuEntry" name="skuEntry" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
@@ -90,9 +90,9 @@
     <h3>Delete SKU Data</h3>
     <form id="deleteSKUentry" action="/deleteData" method="post">
         <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku"><br>
+        <input type="text" id="sku" name="sku" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters"><br>
         <label for="entry">Title of Entry to Delete:</label><br>
-        <input type="text" id="title" name="title"><br>
+        <input type="text" id="title" name="title" pattern="[a-zA-Z0-9\s.]+" title="No special characters"><br>
         <input type="submit" value="Submit">
     </form>
 
