@@ -18,10 +18,9 @@ const server = http.createServer((request, response)=>{
             response.writeHead(200, {  
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
-            if(err){response.end("Error submitting form: "+err); return;}
             connection.query(`CREATE TABLE ${fields.sku[0]} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255) UNIQUE, Entry varchar(255) NOT NULL, FileName varchar(255) UNIQUE,
                 OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
-                if (err){response.end(err.toString()); return;}
+                if (err){response.end("Entry must not be only numbers! " + err.toString()); return;}
                 else {response.end(`${fields.sku[0]} added to database! <br><br><a href="/home">Home</a>`);}
             })
         })  
@@ -36,7 +35,7 @@ const server = http.createServer((request, response)=>{
             'Access-Control-Allow-Origin' : '*'}); 
             if(err){response.end("error submitting form: "+err); return}     
             connection.query(`DROP TABLE ${fields.sku[0]}`, (err, results) =>{
-            if (err) {console.log(err); response.end(err.toString());return;}
+            if (err) {response.end("Entry must not be only numbers! " +err.toString());return;}
             else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a>`);}})
         })
     }
@@ -50,7 +49,7 @@ const server = http.createServer((request, response)=>{
         'Access-Control-Allow-Origin' : '*'});
         if(err){response.end(err)};
         connection.query(`RENAME TABLE ${fields.sku[0]} to ${fields.newSKU[0]}`, (err, results) =>{
-            if (err) {response.end(err.toString()); return;}
+            if (err) {response.end("Entry must not be only numbers! " +err.toString()); return;}
             else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a>`);}})
         })
     }
@@ -63,6 +62,10 @@ const server = http.createServer((request, response)=>{
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end(err)}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
             connection.query(`INSERT INTO ${fields.sku[0]} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
             if (err) {response.end(err.toString()); return;}
             else {response.end(`Entry ${fields.title[0]} added to ${fields.sku[0]}!<br><br><a href="/home">Home</a>`);}})
@@ -80,6 +83,8 @@ const server = http.createServer((request, response)=>{
             if(!files.filetoupload){response.end("no file uploaded");return;}
             fs.readFile(files.filetoupload[0].filepath,(err,data) => {
                 if(err){response.end(err.toString()); console.log(err);return;}
+                fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
+                fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
                 connection.query(`INSERT INTO ${fields.sku[0]} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
                     if(err){response.end(err.toString()); console.log(err); return;}
                     response.end(`${fields.originalfileName[0]} uploaded to sku ${fields.sku[0]} and saved to database!<br><br><a href="/home">Home</a>`);
@@ -96,8 +101,10 @@ const server = http.createServer((request, response)=>{
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end(err.toString()); return;}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
             connection.query(`UPDATE ${fields.sku[0]} SET title = "${fields.updatedTitle[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{if(err){response.end(err.toString()); return;}
-            else {response.end(`${fields.title[0]} updated to ${fields.updatedTitle[0]} in ${fields.sku[0]}!<br><br><a href="/home">Home</a>`);}})
+            else {response.end(`Entry "${fields.title[0]}" in SKU ${fields.sku[0]} has been updated to "${fields.updatedTitle[0]}"! (If entry exists)<br><br><a href="/home">Home</a>`);}})
         })
     }
 
@@ -109,9 +116,13 @@ const server = http.createServer((request, response)=>{
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end(err.toString())}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
             connection.query(`UPDATE ${fields.sku[0]} SET entry = "${fields.skuEntry[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{
                 if (err) {response.end(err.toString()); return;}
-                else {response.end(`${fields.title[0]} updated in ${fields.sku[0]} to ${fields.skuEntry[0]}!<br><br><a href="/home">Home</a>`);}
+                else {response.end(`Entry details for "${fields.title[0]}" in SKU ${fields.sku[0]} have been updated! (If entry exists)<br><br><a href="/home">Home</a>`);}
             })
         })
     }
@@ -124,6 +135,8 @@ const server = http.createServer((request, response)=>{
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
             if(err){response.end(err.toString()); return;}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
             connection.query(`DELETE FROM ${fields.sku[0]} WHERE title = "${fields.title[0]}"`, (err, results) =>{
                 if (err) {response.end(err.toString()); return;}
                 else {response.end(`${fields.title[0]} deleted from ${fields.sku[0]}!<br><br><a href="/home">Home</a>`);}
@@ -183,7 +196,8 @@ const server = http.createServer((request, response)=>{
                     <h1>${tableName}</h1>
                     <ul id="myList2"></ul>
                     ${readRows(jsonObject, tableName)} 
-                    <br><br><a href="/home">Home</a>
+                    <br><br><a href="/home">Home</a><br><br>
+                    <a href="/database">Full Database</a>
 
                 </body>
                 <script>
