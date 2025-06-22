@@ -97,6 +97,16 @@
         <input type="submit" value="Submit">
     </form>
 
+    <!--Delete SKU File-->
+    <h3>Delete SKU File</h3>
+    <form id="deleteSKUfile" action="/deleteFile" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <label for="fileName">Name of File to Delete:</label><br>
+        <input type="text" id="fileName" name="fileName" required><br>
+        <input type="submit" value="Submit">
+    </form>
+
     <h3>Database Page</h3>
     <a href="/database">Full Database</a>
 

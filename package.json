@@ -3,6 +3,7 @@
     "blob": "^0.1.0",
     "buffer": "^6.0.3",
     "Buffer": "^0.0.0",
+    "filereader": "^0.10.3",
     "FileReader": "^0.10.2",
     "formidable": "^3.5.4",
     "mysql": "^2.18.1",
