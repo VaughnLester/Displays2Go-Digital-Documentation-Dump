@@ -241,14 +241,16 @@ const server = http.createServer((request, response)=>{
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Display Array</title>
+                    <title>Database: ${tableName}</title>
                 </head>
+                <a href="/home">Home |
+                <a href="/database">Full Database</a>
                 <body>
                     <h1>${tableName}</h1>
-                    <img src="data:image/png;base64,${getBase64Data()}" />
+                    <img src="data:image/png;base64,${getBase64Data()}"/>
                     <ul id="myList2"></ul>
                     ${readRows(jsonObject, tableName)} 
-                    <br><br><a href="/home">Home</a><br><br>
+                    <br><br><a href="/home">Home |
                     <a href="/database">Full Database</a>
                 </body>
                 <script>
@@ -266,7 +268,6 @@ const server = http.createServer((request, response)=>{
         else {
             async function blobToFile(blob, fileName) {
             const arrayBuffer = await blob.arrayBuffer();
-            console.log(arrayBuffer);
             const buffer = Buffer.from(arrayBuffer);
             if((fileName.includes(".docx"))|fileName.includes(".xlsx")){
                 response.writeHead(200, {

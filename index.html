@@ -3,16 +3,19 @@
 
   <style>
     h3{
-        color: rgb(9, 9, 150);
+        color: black;
     }
 
   </style>
   
   <body>
+    
     <!--Home Page Header-->
-    <h3 style="color:black;">Author: Vaughn Lester - Tech Support Representative</h3>
-    <u><h1>Displays2Go : Digital Documentation Database</h1></u><br>
-
+    <h3 style="color:black;">Author: Vaughn Lester - Tech Support Representative</h3> 
+    <h1><u>Displays2Go : Digital Documentation Database</u></h1> 
+    <a href="/database">View Full Database</a>
+    <br><br>
+<h1 style="color:blue"><i>--------ADD---------</i></h1>
     <!--Create New SKU-->
     <h3>Add a SKU:</h3>
     <form id="addNewSku" action="/newSKU" method="post">
@@ -20,25 +23,6 @@
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
         <input type="submit" value="Submit">
     </form>
-
-    <!--Delete SKU-->
-    <h3>Delete SKU</h3>
-    <form id="deleteSKU" action="/deleteSKU" method="post">
-        <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Change SKU Name-->
-    <h3>Change SKU Name</h3>
-    <form id="changeSKU" action="/changeSKU" method="post">
-        <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-        <label for="newSKU">New Name:</label><br>
-        <input type="text" id="newSKU" name="newSKU" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-        <input type="submit" value="Submit">
-    </form>
-
 
     <!--Add SKU Entry-->
     <h3>Add Data Entry</h3>
@@ -53,7 +37,7 @@
     </form>
 
     <!--Upload File-->
-    <h3>Add File To SKU</h3>
+    <h3>Add File To SKU (Add a photo for the SKU by naming the file "Product Image")</h3>
     <form id="formUpload" action="/upload" method="post" enctype="multipart/form-data">
         <label for="sku">SKU:</label><br>
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
@@ -63,30 +47,7 @@
         <input type="submit">
     </form>
 
-    <!--Update Data Title-->
-    <h3>Update Data Title</h3>
-    <form id="updateSKUentryTitle" action="/updateTitle" method="post">
-        <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-        <label for="title">Entry Title:</label><br>
-        <input type="text" id="title" name="title" required><br>
-        <label for="skuEntry">Updated Entry Title:</label><br>
-        <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <!--Update Data Entry-->
-    <h3>Update Data Entry</h3>
-    <form id="updateSKUentry" action="/updateEntry" method="post">
-        <label for="sku">SKU:</label><br>
-        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-        <label for="title">Entry Title:</label><br>
-        <input type="text" id="title" name="title" required><br>
-        <label for="skuEntry">Entry:</label><br>
-        <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
-        <input type="submit" value="Submit">
-    </form>
-
+<h1 style="color:blue"><i>--------DELETE---------</i></h1>
     <!--Delete SKU Data-->
     <h3>Delete SKU Data</h3>
     <form id="deleteSKUentry" action="/deleteData" method="post">
@@ -107,9 +68,51 @@
         <input type="submit" value="Submit">
     </form>
 
-    <h3>Database Page</h3>
-    <a href="/database">Full Database</a>
+    <!--Delete SKU-->
+    <h3>Delete SKU</h3>
+    <form id="deleteSKU" action="/deleteSKU" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <input type="submit" value="Submit">
+    </form>
 
+<h1 style="color:blue"><i>--------UPDATE---------</i></h1>
+    <!--Change SKU Name-->
+    <h3>Change SKU Name</h3>
+    <form id="changeSKU" action="/changeSKU" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <label for="newSKU">New Name:</label><br>
+        <input type="text" id="newSKU" name="newSKU" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Update Data Entry-->
+    <h3>Update Data Entry</h3>
+    <form id="updateSKUentry" action="/updateEntry" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title" required><br>
+        <label for="skuEntry">Entry:</label><br>
+        <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Update Data Title-->
+    <h3>Update Data Title</h3>
+    <form id="updateSKUentryTitle" action="/updateTitle" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title" required><br>
+        <label for="skuEntry">Updated Entry Title:</label><br>
+        <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <br>
+    <a href="/database">View Full Database</a>
   </body>
 
   <script>
