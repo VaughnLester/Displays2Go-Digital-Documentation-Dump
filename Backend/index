@@ -26,34 +26,6 @@ const server = http.createServer((request, response)=>{
         })  
     }
 
-    //deleteSKU 
-    else if (url == "/deleteSKU"){
-        const deleteSKU = new formidable.IncomingForm();
-        deleteSKU.parse(request,(err, fields, files) =>{
-             response.writeHead(200, {  
-            'Content-Type': 'text/html',
-            'Access-Control-Allow-Origin' : '*'}); 
-            if(err){response.end("error submitting form: "+err); return}     
-            connection.query(`DROP TABLE ${fields.sku[0]}`, (err, results) =>{
-            if (err) {response.end("Entry must not be only numbers! " +err.toString());return;}
-            else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a>`);}})
-        })
-    }
-
-    //changeSKU
-    else if (url == "/changeSKU"){
-        const changeSKU = new formidable.IncomingForm();
-        changeSKU.parse(request, (err,fields,files)=>{
-        response.writeHead(200, {  
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});
-        if(err){response.end(err)};
-        connection.query(`RENAME TABLE ${fields.sku[0]} to ${fields.newSKU[0]}`, (err, results) =>{
-            if (err) {response.end("Entry must not be only numbers! " +err.toString()); return;}
-            else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a>`);}})
-        })
-    }
-
     //addEntry
     else if (url == "/addEntry"){
         const addEntry = new formidable.IncomingForm();
@@ -89,21 +61,69 @@ const server = http.createServer((request, response)=>{
                     if(err){response.end(err.toString()); console.log(err); return;}
                     response.end(`${fields.originalfileName[0]} uploaded to sku ${fields.sku[0]} and saved to database!<br><br><a href="/home">Home</a>`);
                 });
-
-                // if(fields.originalfileName[0] == "Product Image")
-                //  fs.writeFile(files.filetoupload[0].originalFilename, data, (err) => {
-                //     if (err) {
-                //         console.error('Error writing to file:', err);
-                //         return; 
-                //     }
-                
-                // console.log("product image file writen to storage")
-                //}
-                
-                //);
             })
+        })
+    }
 
-           
+    //deleteSKU 
+    else if (url == "/deleteSKU"){
+        const deleteSKU = new formidable.IncomingForm();
+        deleteSKU.parse(request,(err, fields, files) =>{
+             response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'}); 
+            if(err){response.end("error submitting form: "+err); return}     
+            connection.query(`DROP TABLE ${fields.sku[0]}`, (err, results) =>{
+            if (err) {response.end("Entry must not be only numbers! " +err.toString());return;}
+            else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a>`);}})
+        })
+    }
+
+    //deleteData
+    else if (url == "/deleteData"){
+        const deleteData = new formidable.IncomingForm();
+        deleteData.parse(request,(err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString()); return;}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            connection.query(`DELETE FROM ${fields.sku[0]} WHERE title = "${fields.title[0]}"`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`${fields.title[0]} deleted from ${fields.sku[0]}! (If entry exists)<br><br><a href="/home">Home</a>`);}
+            })
+        })
+    }
+
+    //deleteFile
+    else if (url == "/deleteFile"){
+        const deleteData = new formidable.IncomingForm();
+        deleteData.parse(request,(err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString()); return;}
+            fields.fileName[0] = fields.fileName[0].replace('"','');
+            fields.fileName[0] = fields.fileName[0].replace('\\\\','');
+            connection.query(`DELETE FROM ${fields.sku[0]} WHERE FileName = "${fields.fileName[0]}"`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`${fields.fileName[0]} deleted from ${fields.sku[0]}! (If file exists)<br><br><a href="/home">Home</a>`);}
+            })
+        })
+    }
+
+    //changeSKU
+    else if (url == "/changeSKU"){
+        const changeSKU = new formidable.IncomingForm();
+        changeSKU.parse(request, (err,fields,files)=>{
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        if(err){response.end(err)};
+        connection.query(`RENAME TABLE ${fields.sku[0]} to ${fields.newSKU[0]}`, (err, results) =>{
+            if (err) {response.end("Entry must not be only numbers! " +err.toString()); return;}
+            else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a>`);}})
         })
     }
 
@@ -141,36 +161,25 @@ const server = http.createServer((request, response)=>{
         })
     }
 
-    //deleteData
-    else if (url == "/deleteData"){
-        const deleteData = new formidable.IncomingForm();
-        deleteData.parse(request,(err,fields,files)=>{
-            response.writeHead(200, {  
-            'Content-Type': 'text/html',
-            'Access-Control-Allow-Origin' : '*'});
-            if(err){response.end(err.toString()); return;}
-            fields.title[0] = fields.title[0].replace('"','');
-            fields.title[0] = fields.title[0].replace('\\\\','');
-            connection.query(`DELETE FROM ${fields.sku[0]} WHERE title = "${fields.title[0]}"`, (err, results) =>{
-                if (err) {response.end(err.toString()); return;}
-                else {response.end(`${fields.title[0]} deleted from ${fields.sku[0]}! (If entry exists)<br><br><a href="/home">Home</a>`);}
-            })
-        })
-    }
 
-    //deleteFile
-    else if (url == "/deleteFile"){
-        const deleteData = new formidable.IncomingForm();
-        deleteData.parse(request,(err,fields,files)=>{
+    //File Handler: Upldate 
+    // upload files
+    else if (url == "/uploadUpdate"){        
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
             response.writeHead(200, {  
             'Content-Type': 'text/html',
             'Access-Control-Allow-Origin' : '*'});
-            if(err){response.end(err.toString()); return;}
-            fields.fileName[0] = fields.fileName[0].replace('"','');
-            fields.fileName[0] = fields.fileName[0].replace('\\\\','');
-            connection.query(`DELETE FROM ${fields.sku[0]} WHERE FileName = "${fields.fileName[0]}"`, (err, results) =>{
-                if (err) {response.end(err.toString()); return;}
-                else {response.end(`${fields.fileName[0]} deleted from ${fields.sku[0]}! (If file exists)<br><br><a href="/home">Home</a>`);}
+            if(err){response.end("error parsing the file: "+err); return;}
+            if(!files.filetoupload){response.end("no file uploaded");return;}
+            fs.readFile(files.filetoupload[0].filepath,(err,data) => {
+                if(err){response.end(err.toString()); console.log(err);return;}
+                fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
+                fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
+                connection.query(`UPDATE ${fields.sku[0]} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                    if(err){response.end(err.toString()); console.log(err); return;}
+                    response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${fields.sku[0]}! (If it exists)<br><br><a href="/home">Home</a>`);
+                });
             })
         })
     }
