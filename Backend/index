@@ -256,7 +256,7 @@ const server = http.createServer((request, response)=>{
                 <a href="/database">Full Database</a>
                 <body>
                     <h1>${tableName}</h1>
-                    <img src="data:image/png;base64,${getBase64Data()}"/>
+                    <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300"/>
                     <ul id="myList2"></ul>
                     ${readRows(jsonObject, tableName)} 
                     <br><br><a href="/home">Home |
