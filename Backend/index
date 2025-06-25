@@ -320,11 +320,37 @@ password: '9np9VjdEks',
 database: 'sql5768538'
 });
 
+
 //connecting database
 connection.connect(function(err){
     if (err){console.log("error occurred while attempting connection: ", err)}
     else {console.log("database connection successful!")}
 });
+
+function pingDatabase() {
+    connection.query('SELECT 1', (err, result) => {
+        if (err) {
+            console.error('MySQL connection ping failed:', err);
+                connection.connect(function(err){
+                    if (err){console.log("error occurred while attempting connection: ", err)}
+                    else {console.log("database connection successful!")}
+                });
+            if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+                console.log('Attempting to re-connect to MySQL...');
+                connection.destroy(); // Close the broken connection
+                    connection.connect(function(err){
+                        if (err){console.log("error occurred while attempting connection: ", err)}
+                        else {console.log("database connection successful!")}
+                    });
+            }
+        } else {
+            console.log('MySQL connection ping successful.');
+        }
+    });
+}
+
+// Ping every 30 seconds (adjust as needed, considering MySQL's wait_timeout)
+setInterval(pingDatabase, 30 * 1000);
 
 //connecting server
 server.listen(5001, console.log("server is listening on 5001"));
