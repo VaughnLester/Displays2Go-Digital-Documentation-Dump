@@ -40,7 +40,7 @@
 
 
     <!--Add SKU Entry-->
-    <h3>Add Data Entry:</h3>
+    <!-- <h3>Add Data Entry:</h3>
     <form id="addSkuEntry" action="/addEntry" method="post">
         <label for="sku">SKU:</label><br>
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
@@ -49,11 +49,11 @@
         <label for="skuEntry">Entry:</label><br>
         <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
         <input type="submit" value="Submit">
-    </form>
+    </form> -->
 
 
     <!--Upload File-->
-    <h3>Add File To SKU: (Add a photo for the SKU by naming the file "Product Image")</h3>
+    <!-- <h3>Add File To SKU: (Add a photo for the SKU by naming the file "Product Image")</h3>
     <form id="formUpload" action="/upload" method="post" enctype="multipart/form-data">
         <label for="sku">SKU:</label><br>
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
@@ -61,7 +61,7 @@
         <input type="text" id="originalfileName" name="originalfileName" required><br>
         <input type="file" name="filetoupload" required><br>
         <input type="submit">
-    </form>
+    </form> -->
 
 
 <h1 style="color:blue"><i>--------DELETE---------</i></h1>
@@ -75,24 +75,24 @@
     </form>
     
     <!--Delete SKU Data-->
-    <h3>Delete SKU Data:</h3>
+    <!-- <h3>Delete SKU Data:</h3>
     <form id="deleteSKUentry" action="/deleteData" method="post">
         <label for="sku">SKU:</label><br>
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
         <label for="entry">Title of Entry to Delete:</label><br>
         <input type="text" id="title" name="title" required><br>
         <input type="submit" value="Submit">
-    </form>
+    </form> -->
 
     <!--Delete SKU File-->
-    <h3>Delete SKU File:</h3>
+    <!-- <h3>Delete SKU File:</h3>
     <form id="deleteSKUfile" action="/deleteFile" method="post">
         <label for="sku">SKU:</label><br>
         <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
         <label for="fileName">Name of File to Delete:</label><br>
         <input type="text" id="fileName" name="fileName" required><br>
         <input type="submit" value="Submit">
-    </form>
+    </form> -->
 
 <h1 style="color:blue"><i>--------UPDATE---------</i></h1>
     <!--Change SKU Name-->

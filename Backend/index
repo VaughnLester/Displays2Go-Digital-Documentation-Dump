@@ -27,7 +27,9 @@ const server = http.createServer((request, response)=>{
     }
 
     //addEntry
-    else if (url == "/addEntry"){
+     else if (parsedUrl.pathname == "/addEntry"){
+        const params = new URLSearchParams(parsedUrl.search);
+        console.log(params.get('name'))
         const addEntry = new formidable.IncomingForm();
         addEntry.parse(request, (err,fields,files)=>{
             response.writeHead(200, {  
@@ -38,14 +40,15 @@ const server = http.createServer((request, response)=>{
             fields.title[0] = fields.title[0].replace('\\\\','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
-            connection.query(`INSERT INTO ${fields.sku[0]} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
+            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
             if (err) {response.end(err.toString()); return;}
-            else {response.end(`Entry ${fields.title[0]} added to ${fields.sku[0]}!<br><br><a href="/home">Home</a>`);}})
+            else {response.end(`Entry ${fields.title[0]} added to ${params.get('name')}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}})
         })
     }
 
     //File Handler: upload files
-    else if (url == "/upload"){        
+    else if (parsedUrl.pathname == "/upload"){        
+        const params = new URLSearchParams(parsedUrl.search);
         const form = new formidable.IncomingForm(); 
         form.parse(request, (err, fields, files)=>{
             response.writeHead(200, {  
@@ -57,9 +60,9 @@ const server = http.createServer((request, response)=>{
                 if(err){response.end(err.toString()); console.log(err);return;}
                 fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
                 fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
-                connection.query(`INSERT INTO ${fields.sku[0]} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                connection.query(`INSERT INTO ${params.get('name')} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
                     if(err){response.end(err.toString()); console.log(err); return;}
-                    response.end(`${fields.originalfileName[0]} uploaded to sku ${fields.sku[0]} and saved to database!<br><br><a href="/home">Home</a>`);
+                    response.end(`${fields.originalfileName[0]} uploaded to sku ${params.get('name')} and saved to database!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);
                 });
             })
         })
@@ -75,12 +78,13 @@ const server = http.createServer((request, response)=>{
             if(err){response.end("error submitting form: "+err); return}     
             connection.query(`DROP TABLE ${fields.sku[0]}`, (err, results) =>{
             if (err) {response.end("Entry must not be only numbers! " +err.toString());return;}
-            else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a>`);}})
+            else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a> | <a href="/database">Full Database</a>`);}})
         })
     }
 
     //deleteData
-    else if (url == "/deleteData"){
+    else if (parsedUrl.pathname == "/deleteData"){
+        const params = new URLSearchParams(parsedUrl.search);
         const deleteData = new formidable.IncomingForm();
         deleteData.parse(request,(err,fields,files)=>{
             response.writeHead(200, {  
@@ -89,15 +93,16 @@ const server = http.createServer((request, response)=>{
             if(err){response.end(err.toString()); return;}
             fields.title[0] = fields.title[0].replace('"','');
             fields.title[0] = fields.title[0].replace('\\\\','');
-            connection.query(`DELETE FROM ${fields.sku[0]} WHERE title = "${fields.title[0]}"`, (err, results) =>{
+            connection.query(`DELETE FROM ${params.get('name')} WHERE title = "${fields.title[0]}"`, (err, results) =>{
                 if (err) {response.end(err.toString()); return;}
-                else {response.end(`${fields.title[0]} deleted from ${fields.sku[0]}! (If entry exists)<br><br><a href="/home">Home</a>`);}
+                else {response.end(`${fields.title[0]} deleted from ${params.get('name')}! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}
             })
         })
     }
 
     //deleteFile
-    else if (url == "/deleteFile"){
+    else if (parsedUrl.pathname == "/deleteFile"){
+        const params = new URLSearchParams(parsedUrl.search);
         const deleteData = new formidable.IncomingForm();
         deleteData.parse(request,(err,fields,files)=>{
             response.writeHead(200, {  
@@ -106,9 +111,9 @@ const server = http.createServer((request, response)=>{
             if(err){response.end(err.toString()); return;}
             fields.fileName[0] = fields.fileName[0].replace('"','');
             fields.fileName[0] = fields.fileName[0].replace('\\\\','');
-            connection.query(`DELETE FROM ${fields.sku[0]} WHERE FileName = "${fields.fileName[0]}"`, (err, results) =>{
+            connection.query(`DELETE FROM ${params.get('name')} WHERE FileName = "${fields.fileName[0]}"`, (err, results) =>{
                 if (err) {response.end(err.toString()); return;}
-                else {response.end(`${fields.fileName[0]} deleted from ${fields.sku[0]}! (If file exists)<br><br><a href="/home">Home</a>`);}
+                else {response.end(`${fields.fileName[0]} deleted from ${fields.sku[0]}! (If file exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}
             })
         })
     }
@@ -249,6 +254,18 @@ const server = http.createServer((request, response)=>{
             response.end(`    
             <!DOCTYPE html>
             <html>
+                <style>
+                    .container{
+                        display: grid;
+                        grid-template-columns: 3fr 3fr 3fr 3fr;
+                        padding: 10px;
+                    }
+                    .container > div{
+                        background-color: lightblue;
+                        border-style: solid;
+                        border-color: black;
+                    }
+                </style>
                 <head>
                     <title>Database: ${tableName}</title>
                 </head>
@@ -259,6 +276,60 @@ const server = http.createServer((request, response)=>{
                     <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300" alt=" "/>
                     <ul id="myList2"></ul>
                     ${readRows(jsonObject, tableName)} 
+
+                    <div class="container">
+                        <div id="addEntryForm">
+                            <h2>Add Data Entry:</h2>
+                            <form id="addSkuEntry" action="/addEntry?name=${tableName}" method="post">
+                                <label for="title">Entry Title:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Entry:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form><br><br>
+                        </div>
+                        <div id="deleteEntryForm"> 
+                            <h2>Delete Entry:</h2>
+                            <form id="deleteSKUentry" action="/deleteData?name=${tableName}" method="post">
+                                <label for="entry">Title of Entry to Delete:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <h2>Update Entry Title</h2>
+                        </div>
+                        <div>
+                            <h2>Update Entry Details</h2>
+                        </div>
+                        <div>
+                            <h2>Add File:</h2>
+                            <form id="formUpload" action="/upload?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File Name: ("Product Image" to add image)</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <h2>Delete File:</h2>
+                            <form id="deleteSKUfile" action="/deleteFile?name=${tableName}" method="post">
+                                <label for="sku">SKU:</label><br>
+                                <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+                                <label for="fileName">Name of File to Delete:</label><br>
+                                <input type="text" id="fileName" name="fileName" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <h2>Update File Name</h2>
+                        </div>
+                        <div>
+                            <h2>Change File</h2>
+                        </div>
+                    </div>
+
+
                     <br><br><a href="/home">Home |
                     <a href="/database">Full Database</a>
                 </body>
