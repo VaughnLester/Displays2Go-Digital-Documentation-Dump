@@ -314,8 +314,6 @@ const server = http.createServer((request, response)=>{
                         <div>
                             <h2>Delete File:</h2>
                             <form id="deleteSKUfile" action="/deleteFile?name=${tableName}" method="post">
-                                <label for="sku">SKU:</label><br>
-                                <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
                                 <label for="fileName">Name of File to Delete:</label><br>
                                 <input type="text" id="fileName" name="fileName" required><br>
                                 <input type="submit" value="Submit">
