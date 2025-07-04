@@ -128,12 +128,13 @@ const server = http.createServer((request, response)=>{
         if(err){response.end(err)};
         connection.query(`RENAME TABLE ${fields.sku[0]} to ${fields.newSKU[0]}`, (err, results) =>{
             if (err) {response.end("Entry must not be only numbers! " +err.toString()); return;}
-            else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a>`);}})
+            else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}})
         })
     }
 
     //updateTitle
-    else if (url == "/updateTitle"){
+    else if (parsedUrl.pathname == "/updateTitle"){
+        const params = new URLSearchParams(parsedUrl.search);
         const updateTitle = new formidable.IncomingForm();
         updateTitle.parse(request, (err,fields,files)=>{
             response.writeHead(200, {  
@@ -142,13 +143,14 @@ const server = http.createServer((request, response)=>{
             if(err){response.end(err.toString()); return;}
             fields.title[0] = fields.title[0].replace('"','');
             fields.title[0] = fields.title[0].replace('\\\\','');
-            connection.query(`UPDATE ${fields.sku[0]} SET title = "${fields.updatedTitle[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{if(err){response.end(err.toString()); return;}
-            else {response.end(`Entry "${fields.title[0]}" in SKU ${fields.sku[0]} has been updated to "${fields.updatedTitle[0]}"! (If entry exists)<br><br><a href="/home">Home</a>`);}})
+            connection.query(`UPDATE ${params.get('name')} SET title = "${fields.updatedTitle[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{if(err){response.end(err.toString()); return;}
+            else {response.end(`Entry "${fields.title[0]}" in SKU ${params.get('name')} has been updated to "${fields.updatedTitle[0]}"! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}})
         })
     }
 
     //updateEntry
-    else if (url == "/updateEntry"){
+    else if (parsedUrl.pathname == "/updateEntry"){
+        const params = new URLSearchParams(parsedUrl.search);
         const updateEntry = new formidable.IncomingForm();
         updateEntry.parse(request,(err,fields,files)=>{
             response.writeHead(200, {  
@@ -159,9 +161,9 @@ const server = http.createServer((request, response)=>{
             fields.title[0] = fields.title[0].replace('\\\\','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
-            connection.query(`UPDATE ${fields.sku[0]} SET entry = "${fields.skuEntry[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{
+            connection.query(`UPDATE ${params.get('name')} SET entry = "${fields.skuEntry[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{
                 if (err) {response.end(err.toString()); return;}
-                else {response.end(`Entry details for "${fields.title[0]}" in SKU ${fields.sku[0]} have been updated! (If entry exists)<br><br><a href="/home">Home</a>`);}
+                else {response.end(`Entry details for "${fields.title[0]}" in SKU ${params.get('name')} have been updated! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}
             })
         })
     }
@@ -169,7 +171,8 @@ const server = http.createServer((request, response)=>{
 
     //File Handler: Upldate 
     // upload files
-    else if (url == "/uploadUpdate"){        
+    else if (parsedUrl.pathname == "/uploadUpdate"){       
+        const params = new URLSearchParams(parsedUrl.search); 
         const form = new formidable.IncomingForm(); 
         form.parse(request, (err, fields, files)=>{
             response.writeHead(200, {  
@@ -181,11 +184,30 @@ const server = http.createServer((request, response)=>{
                 if(err){response.end(err.toString()); console.log(err);return;}
                 fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
                 fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
-                connection.query(`UPDATE ${fields.sku[0]} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                connection.query(`UPDATE ${params.get('name')} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
                     if(err){response.end(err.toString()); console.log(err); return;}
-                    response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${fields.sku[0]}! (If it exists)<br><br><a href="/home">Home</a>`);
+                    response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);
                 });
             })
+        })
+    }
+
+        else if (parsedUrl.pathname == "/updateFileName"){       
+        const params = new URLSearchParams(parsedUrl.search); 
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end("error parsing the file: "+err); return;}
+            fields.FileName[0] = fields.FileName[0].replace('"', '');
+            fields.FileName[0] = fields.FileName[0].replace('\\\\', '');
+            fields.newFileName[0] = fields.newFileName[0].replace('"', '');
+            fields.newFileName[0] = fields.newFileName[0].replace('\\\\', '');
+            connection.query(`UPDATE ${params.get('name')} SET FileName = "${fields.newFileName[0]}" WHERE FileName = "${fields.FileName}"`,(err, results)=>{
+                if(err){response.end(err.toString()); console.log(err); return;}
+                response.end(`${fields.FileName} updated to ${fields.newFileName[0]} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);
+            }); 
         })
     }
 
@@ -297,10 +319,24 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Update Entry Title</h2>
+                            <h2>Update Entry Title:</h2>
+                            <form id="updateSKUentryTitle" action="/updateTitle?name=${tableName}" method="post">
+                                <label for="title">Entry Title to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Entry Title:</label><br>
+                                <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
+                                <input type="submit" value="Submit">
+                            </form>
                         </div>
                         <div>
-                            <h2>Update Entry Details</h2>
+                            <h2>Update Entry Details:</h2>
+                            <form id="updateSKUentry" action="/updateEntry?name=${tableName}" method="post">
+                                <label for="title">Entry to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Entry Details:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
                         </div>
                         <div>
                             <h2>Add File:</h2>
@@ -321,9 +357,22 @@ const server = http.createServer((request, response)=>{
                         </div>
                         <div>
                             <h2>Update File Name</h2>
+                            <form id="formUpdateFileName" action="/updateFileName?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="FileName">File Name:</label><br>
+                                <input type="text" name="FileName" name="newFileName" required><br>
+                                <label for="newFileName">New File Name:</label><br>
+                                <input type="text" name="newFileName" required><br>
+                                <input type="submit">
+                            </form>
                         </div>
                         <div>
-                            <h2>Change File</h2>
+                            <h2>Update File:</h2>
+                            <form id="formUpload" action="/uploadUpdate?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File to Update:</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
                         </div>
                     </div>
 
