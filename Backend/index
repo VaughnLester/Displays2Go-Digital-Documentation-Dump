@@ -277,6 +277,9 @@ const server = http.createServer((request, response)=>{
             <!DOCTYPE html>
             <html>
                 <style>
+                    body{
+                        background-image: url("7110.jpg");
+                    }
                     .container{
                         display: grid;
                         grid-template-columns: 3fr 3fr 3fr 3fr;
