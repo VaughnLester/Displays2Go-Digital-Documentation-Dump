@@ -6,12 +6,13 @@ const formidable = require('formidable');
 const { Blob } = require('buffer');
 const { Buffer } = require('node:buffer');
 
-//SERVER API
+//SERVER CREATEION AND API
 const server = http.createServer((request, response)=>{
     const url = request.url;
     const parsedUrl = urlParsing.parse(url, true)
 
     //newSKU
+    //Creates a SKU table that has columns ID, Title, Entry, FileName, OriginalFileName, and File
     if (url == "/newSKU"){
         const newSKU = new formidable.IncomingForm(); 
         newSKU.parse(request, (err, fields, files) =>{
@@ -239,6 +240,7 @@ const server = http.createServer((request, response)=>{
     }
 
     //table - attaches to table list as a link per table that selects all from the table, in database.html file 
+    //table is the path from the link
     else if (parsedUrl.pathname == "/table"){
         let body = " ";
         request.on('data', chunk => {body += chunk.toString()})
@@ -272,7 +274,7 @@ const server = http.createServer((request, response)=>{
                 max--;
                 }
             }
-
+            //the page that generates from each sku link
             response.end(`    
             <!DOCTYPE html>
             <html>
@@ -492,9 +494,9 @@ server.listen(5001, console.log("server is listening on 5001"));
 
 //-------------------------------------------------------------------
 //functions used:
-//grab data from each row in database, add list item HTML
 
-//Everything works perfectly for uploading files, now just edit so each file has a label that is displayed next to it, which is the descriptive file name - do this first by adding another column to the table for file label, then pulling that column for each file pull and adding it to display with the file name which is already perfectly linked - do not need the file itself to display!!!
+//grab data from each row in database, add list item HTML
+//also adds a LINK to path /table with it's sku name
 function readRows(arr,sku){
     let max = arr.length -1;
     let results = ' ';
