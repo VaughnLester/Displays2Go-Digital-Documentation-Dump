@@ -311,6 +311,7 @@ const server = http.createServer((request, response)=>{
                     
                     <div style="">
                     <ul id="myList2"></ul>
+                    <h3><b><i>Use ctrl+F to search for any entry</i></b></h3>
                     <b>${readRows(jsonObject, tableName)}</b>
                     </div>
                     
