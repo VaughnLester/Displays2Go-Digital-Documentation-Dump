@@ -41,7 +41,7 @@ const server = http.createServer((request, response)=>{
             fields.title[0] = fields.title[0].replace('\\\\','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
-            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
+            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry, FileName) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}", "${fields.title[0]}")`, (err, results) =>{
             if (err) {response.end(err.toString()); return;}
             else {response.end(`Entry ${fields.title[0]} added to ${params.get('name')}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>`);}})
         })
@@ -217,6 +217,7 @@ const server = http.createServer((request, response)=>{
     }
 
     //database pull - used to list all tables in datbase.html file
+    //MAKE THIS ALPHABETICAL !!
     else if (url == "/databasePull"){
         connection.query('SHOW TABLES;', (err,results) =>{ 
             response.writeHead(200, {
@@ -254,7 +255,7 @@ const server = http.createServer((request, response)=>{
             'Access-Control-Allow-Origin' : '*'});
             const searchParams = new URLSearchParams(parsedUrl.search);   
             const tableName = searchParams.get('name');
-            connection.query(`SELECT * FROM ${tableName}`, (err, results) =>{
+            connection.query(`SELECT * FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
             if (err) {response.end("error inserting data into database "+ err); return;}
             else {
             //defining the array from all tables
@@ -399,7 +400,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                     </div>
-                    <div style="position:fixed; left:0; bottom:0; font-weight: bold;"
+                    <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
                         <b><a href="/home">Home |</a></b>
                         <a href="/database">Full Database</a></b>         
                     </div>
@@ -507,11 +508,12 @@ server.listen(5001, console.log("server is listening on 5001"));
 //also adds a LINK to path /table with it's sku name
 
 //TO DO:
-
 //ORGANIZE THE LIST ALPHABETICALLY HERE!
 //THEN ADD SECURITY TO ALL FORMS FOR ONLY AUTHORIZED PERSONAL!!
 //CHANGE CLIENT SIDE MAX PACKEETS ALLOWED TO FIX ISSUE!!! 
 //MAKE SURE YOU CAN UPLOAD FILES UP TO 1G!
+//IMPROVE DESIGN BEFORE FINAL PRESENTATION!!
+//CHANGE ENTRY TO LINK EVERYWHERE !!            
 function readRows(arr,sku){
     let max = arr.length -1;
     let results = ' ';
