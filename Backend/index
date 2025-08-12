@@ -250,8 +250,8 @@ const server = http.createServer((request, response)=>{
 
 
             setTimeout(function() {
-                window.location.assign("/table?name=${params.get('name')}");
-            }, 0); // in milliseconds
+                history.back();
+            }, 1000); // in milliseconds
                     
             
             </script>`);}
@@ -569,7 +569,7 @@ const server = http.createServer((request, response)=>{
                     
                     <div>
                     <ul id="myList2"></ul>
-                    <h3><b><i>Use ctrl+F to search for any entry</i></b></h3>
+                    <h3><b><i>Refresh to see changes! Use ctrl+F to search for any entry.</i></b></h3>
                     <b>${readRows(jsonObject, tableName)}</b>
                     </div>
                     
