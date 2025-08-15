@@ -6,6 +6,11 @@ const formidable = require('formidable');
 const { Blob } = require('buffer');
 const { Buffer } = require('node:buffer');
 
+    const username = 'admin';
+    const password = 'securepassword';
+    
+
+
 //SERVER CREATEION AND API
 const server = http.createServer((request, response)=>{
     const url = request.url;
@@ -36,6 +41,8 @@ const server = http.createServer((request, response)=>{
             })
         })  
     }
+
+    
 
     //addEntry
      else if (parsedUrl.pathname == "/addEntry"){
@@ -354,16 +361,21 @@ const server = http.createServer((request, response)=>{
         });
     }
 
+
+    //make this path into a FORM that accepts a password
+    //if the password is correct, then send database.html
+    //if not, send "incorrect password"!
     //database - returns databse.html file to frontend
     else if (url == "/database"){
-        response.writeHead(200, {
-        'Content-Type': 'text/html',
-        'Access-Control-Allow-Origin' : '*'});
-        fs.readFile('database.html', function(err,content){
-        if(err){response.end(err.toString());return;}
-        else{response.end(content);}
-        })
-    }
+            response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            fs.readFile('database.html', function(err,content){
+            if(err){response.end(err.toString());return;}
+            else{response.end(content);}
+            })
+        }
+
 
     //table - attaches to table list as a link per table that selects all from the table, in database.html file 
     //table is the path from the link
@@ -564,7 +576,40 @@ const server = http.createServer((request, response)=>{
         }})
     }
 
-    //If no route is found, defaults to returning index.html 
+    //serves page home.html
+   else if (url.includes("/home")){
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        //fs.createReadStream('index.html').pipe(response);
+        fs.readFile('home.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end("error fetching index.html home file")}
+        else {
+            response.end(content);
+        }})
+    }
+
+
+    //handles the form to login to the website
+    //serves a buffer page to move to website paths 
+    else if (url.includes("/login")){
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            const password = fields.password[0];
+            if (password == 'vaughn'){
+                response.writeHead(200, {
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin' : '*'});
+                fs.readFile('secure.html', function(err,content){
+                if(err){response.end(err.toString());return;}
+                else{response.end(content);}
+                })
+            }
+            else{response.end("Incorrect Password! Access Denied - Go back.")}
+        }
+    )}
+
+    //If no route is found, defaults to login page
     else {
         response.writeHead(200, {
         'Content-Type': 'text/html',
@@ -576,7 +621,12 @@ const server = http.createServer((request, response)=>{
             response.end(content);
         }})
     }
+
 });//end server
+
+
+
+
 
 //creating database connection, hosted on freesqldatabase.com
 const connection = mysql.createConnection({
@@ -615,8 +665,12 @@ function pingDatabase() {
     });
 }
 
+
 // Ping every 30 seconds (adjust as needed, considering MySQL's wait_timeout)
 setInterval(pingDatabase, 30 * 1000);
+
+
+
 
 //connecting server
 server.listen(5001, console.log("server is listening on 5001"));
@@ -676,19 +730,3 @@ function readTables(arr){
     return newResults;
 }
 
-//websocket used after form entry to go back to previous page!
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8080 });
-
-wss.on('connection', ws => {
-  console.log('Client connected');
-
-  // Example: Send a refresh message after 5 seconds
-  setTimeout(() => {
-    ws.send('refresh');
-  }, 0);
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});

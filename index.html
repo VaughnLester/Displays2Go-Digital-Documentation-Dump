@@ -24,61 +24,30 @@
 </style>
   
 <title>Digital Documentation Data Dump</title>
+<!--Home Page Header-->
+<h3>Author: Vaughn Lester - Tech Support Representative, v8.15.25</h3> 
+<h1><u>Displays2Go : Digital Documentation Database</u></h1>
 
   <body>
 
-    
-    <!--Home Page Header-->
-    <h3>Author: Vaughn Lester - Tech Support Representative, v7.7.25</h3> 
-    <h1><u>Displays2Go : Digital Documentation Database</u></h1> 
-    <a href="/database"><b>View Full Database</b></a>
-    <br><br>
 
 <div class="container">
     <div>
-    <h1> ADD A SKU</h1>
-        <!--Create New SKU-->
-
-        <form id="addNewSku" action="/newSKU" method="post">
-            <label for="sku">SKU:</label><br> 
-            <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-            <input type="submit" value="Submit">
-        </form>
-    </div><br>
-
-    <div>
-    <h1> DELETE SKU</h1>
-
-        <!--Delete SKU-->
-
-        <form id="deleteSKU" action="/deleteSKU" method="post">
-            <label for="sku">SKU:</label><br>
-            <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-            <input type="submit" value="Submit">
-        </form>
-        </div><br>
-    
-    <div>
-    <h1> UPDATE SKU NAME</h1>
+    <h1> ACCESS WEBSITE</h1>
         <!--Change SKU Name-->
 
-        <form id="changeSKU" action="/changeSKU" method="post">
-            <label for="sku">SKU:</label><br>
-            <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
-            <label for="newSKU">Updated SKU Name:</label><br>
-            <input type="text" id="newSKU" name="newSKU" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+        <form id="accessDatabase" action="/login" method="post">
+            <label for="password">Password:</label><br>
+            <input type="text" id="password" name="password" required><br>
             <input type="submit" value="Submit">
         </form>
     </div>
 
-    </div>
-
-    <div style="position:fixed; left:0; bottom:0; font-weight: bold;">
-        <a href="/database">View Full Database</a></b>         
     </div>
   </body>
 
   <script>
-
+    //hides the real path so users cannot access without logging in first
+    history.replaceState({}, '', '/securelogin');
   </script>
 </html>
