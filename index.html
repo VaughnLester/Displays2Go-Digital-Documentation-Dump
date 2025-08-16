@@ -13,30 +13,36 @@
         align-self: center;
         display: grid;
         grid-template-columns: 1fr; 
-                                
+                       
         padding: 10px;
     }
     .container > div{
-        
+          position: absolute; /* Takes the div out of normal document flow */
+  top: 50%; /* Positions the top edge at 50% from the top */
+  left: 46%; /* Positions the left edge at 50% from the left */
+  transform: translate(-50%, -50%); /* Shifts the div back by half its own width and height */
+  /* Your div's specific styles */
+
         border-color: black;
         width: 23%;
     }
+
+    
 </style>
   
 <title>Digital Documentation Data Dump</title>
 <!--Home Page Header-->
-<h3>Author: Vaughn Lester - Tech Support Representative, v8.15.25</h3> 
-<h1><u>Displays2Go : Digital Documentation Database</u></h1>
+<h3 style="position:absolute; left:33%; top:10%;">Author: Vaughn Lester - Tech Support Representative, v8.15.25</h3> 
+<h1 style="position:absolute; left:30%"><u>Displays2Go : Digital Documentation Database</u></h1>
 
   <body>
 
 
 <div class="container">
-    <div>
-    <h1> ACCESS WEBSITE</h1>
-        <!--Change SKU Name-->
-
-        <form id="accessDatabase" action="/login" method="post">
+    <div style="border-style:dashed; padding:10px; background-color: rgb(185, 182, 182);">
+        <form  id="accessDatabase" action="/login" method="post">
+            <header><h1>ACCESS WEBSITE</h1></header>
+            <p>Enter Password To Access Website (no spaces)</p>
             <label for="password">Password:</label><br>
             <input type="text" id="password" name="password" required><br>
             <input type="submit" value="Submit">
