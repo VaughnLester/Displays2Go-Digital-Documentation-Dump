@@ -421,9 +421,10 @@ const server = http.createServer((request, response)=>{
 
                     }
                     .container{
+                        
                         display: grid;
-                        grid-template-columns: 3fr 3fr 3fr 3fr;
-                        gird-gap: 10px;
+                        grid-template-columns: auto auto;
+                        
                     }
                     .container > div{
                         
@@ -441,10 +442,11 @@ const server = http.createServer((request, response)=>{
                 <head>
                     <title>Database: ${tableName}</title>
                 </head>
+                <body>
                 <div id="menu">
                 <b><a href="/home">Home |
                 <a href="/database">Full Database</a></b>
-                <body>
+                
                 
                     <h1>${tableName}</h1>
                     <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300" alt=" "/>
@@ -459,17 +461,17 @@ const server = http.createServer((request, response)=>{
 
                     <div class="container">
                         <div id="addEntryForm">
-                            <h2>Add Link:</h2>
+                            <u><h2>Add Link:</h2></u>
                             <form id="addSkuEntry" action="/addEntry?name=${tableName}" method="post">
                                 <label for="title">Link Name:</label><br>
                                 <input type="text" id="title" name="title" required><br>
                                 <label for="skuEntry">Link:</label><br>
                                 <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
                                 <input type="submit" value="Submit">
-                            </form><br><br>
+                            </form>
                         </div>
                         <div id="deleteEntryForm"> 
-                            <h2>Delete Link:</h2>
+                            <u><h2>Delete Link:</h2></u>
                             <form id="deleteSKUentry" action="/deleteData?name=${tableName}" method="post">
                                 <label for="entry">Name of Link to Delete:</label><br>
                                 <input type="text" id="title" name="title" required><br>
@@ -477,7 +479,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Update Link Name:</h2>
+                            <u><h2>Update Link Name:</h2></u>
                             <form id="updateSKUentryTitle" action="/updateTitle?name=${tableName}" method="post">
                                 <label for="title">Link Name to Update:</label><br>
                                 <input type="text" id="title" name="title" required><br>
@@ -487,7 +489,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Update Link Entry:</h2>
+                            <u><h2>Update Link Entry:</h2></u>
                             <form id="updateSKUentry" action="/updateEntry?name=${tableName}" method="post">
                                 <label for="title">Link to Update:</label><br>
                                 <input type="text" id="title" name="title" required><br>
@@ -497,7 +499,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Add File:</h2>
+                            <u><h2>Add File:</h2></u>
                             <form id="formUpload" action="/upload?name=${tableName}" method="post" enctype="multipart/form-data">
                                 <label for="originalfileName">File Name: ("Product Image" to add image)</label><br>
                                 <input type="text" id="originalfileName" name="originalfileName" required><br>
@@ -506,7 +508,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Delete File:</h2>
+                            <u><h2>Delete File:</h2></u>
                             <form id="deleteSKUfile" action="/deleteFile?name=${tableName}" method="post">
                                 <label for="fileName">Name of File to Delete:</label><br>
                                 <input type="text" id="fileName" name="fileName" required><br>
@@ -514,7 +516,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Update File Name</h2>
+                            <u><h2>Update File Name</h2></u>
                             <form id="formUpdateFileName" action="/updateFileName?name=${tableName}" method="post" enctype="multipart/form-data">
                                 <label for="FileName">File Name:</label><br>
                                 <input type="text" name="FileName" name="newFileName" required><br>
@@ -524,7 +526,7 @@ const server = http.createServer((request, response)=>{
                             </form>
                         </div>
                         <div>
-                            <h2>Update File:</h2>
+                            <u><h2>Update File:</h2></u>
                             <form id="formUpload" action="/uploadUpdate?name=${tableName}" method="post" enctype="multipart/form-data">
                                 <label for="originalfileName">File to Update:</label><br>
                                 <input type="text" id="originalfileName" name="originalfileName" required><br>
