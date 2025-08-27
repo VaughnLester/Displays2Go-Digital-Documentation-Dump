@@ -31,7 +31,6 @@ const server = http.createServer((request, response)=>{
                                                     <script>
                 
 
-
             setTimeout(function() {
                 history.back();
             }, 1000); // in milliseconds
@@ -444,7 +443,7 @@ const server = http.createServer((request, response)=>{
                 </head>
                 <body>
                 <div id="menu">
-                <b><a href="/home">Home |
+                <b><a href="/65432987655">Home |
                 <a href="/database">Full Database</a></b>
                 
                 
@@ -536,7 +535,7 @@ const server = http.createServer((request, response)=>{
                         </div>
                     </div>
                     <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
-                        <b><a href="/home">Home |</a></b>
+                        <b><a href="/65432987655">Home |</a></b>
                         <a href="/database">Full Database</a></b>         
                     </div>
                 </body>
@@ -579,7 +578,7 @@ const server = http.createServer((request, response)=>{
     }
 
     //serves page home.html
-   else if (url.includes("/home")){
+   else if (url.includes("/65432987655")){
         response.writeHead(200, {
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin' : '*'});//enables CORS
@@ -610,6 +609,19 @@ const server = http.createServer((request, response)=>{
             else{response.end("Incorrect Password! Access Denied - Go back.")}
         }
     )}
+
+    //handles SKU page seperately to load faster!
+    else if (url.includes("/test")){
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        //fs.createReadStream('index.html').pipe(response);
+        fs.readFile('test.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end("error fetching index.html home file")}
+        else {
+            response.end(content);
+        }})
+    }
 
     //If no route is found, defaults to login page
     else {

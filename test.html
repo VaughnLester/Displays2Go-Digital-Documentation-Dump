@@ -1,0 +1,132 @@
+          <!DOCTYPE html>
+            <html>
+                <style>
+                    body{
+
+                    }
+                    .container{
+                        
+                        display: grid;
+                        grid-template-columns: auto auto;
+                        
+                    }
+                    .container > div{
+                        
+                        
+                        border-color: black;
+                    }
+                    #menu{
+                        float: left;
+                        width: 800px;
+                    }
+                    #entryList{
+                       
+                    }
+                </style>
+                <head>
+                    <title>Database: AndroidOS</title>
+                </head>
+                <body>
+                <div id="menu">
+                <b><a href="/65432987655">Home |
+                <a href="/database">Full Database</a></b>
+                
+                
+                    <h1>AndroidOS</h1>
+                    <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300" alt=" "/>
+                    
+                    <div>
+                    <ul id="myList2"></ul>
+                    <h3><b><i>Refresh to see changes! Use ctrl+F to search for any entry.</i></b></h3>
+                    <b>${readRows(jsonObject, tableName)}</b>
+                    </div>
+                    
+                </div>
+
+                    <div class="container">
+                        <div id="addEntryForm">
+                            <u><h2>Add Link:</h2></u>
+                            <form id="addSkuEntry" action="/addEntry?name=AndroidOS" method="post">
+                                <label for="title">Link Name:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Link:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div id="deleteEntryForm"> 
+                            <u><h2>Delete Link:</h2></u>
+                            <form id="deleteSKUentry" action="/deleteData?name=AndroidOS" method="post">
+                                <label for="entry">Name of Link to Delete:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Name:</h2></u>
+                            <form id="updateSKUentryTitle" action="/updateTitle?name=AndroidOS" method="post">
+                                <label for="title">Link Name to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Name:</label><br>
+                                <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Entry:</h2></u>
+                            <form id="updateSKUentry" action="/updateEntry?name=AndroidOS" method="post">
+                                <label for="title">Link to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Entry:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Add File:</h2></u>
+                            <form id="formUpload" action="/upload?name=AndroidOS" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File Name: ("Product Image" to add image)</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Delete File:</h2></u>
+                            <form id="deleteSKUfile" action="/deleteFile?name=AndroidOS" method="post">
+                                <label for="fileName">Name of File to Delete:</label><br>
+                                <input type="text" id="fileName" name="fileName" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File Name</h2></u>
+                            <form id="formUpdateFileName" action="/updateFileName?name=AndroidOS" method="post" enctype="multipart/form-data">
+                                <label for="FileName">File Name:</label><br>
+                                <input type="text" name="FileName" name="newFileName" required><br>
+                                <label for="newFileName">New File Name:</label><br>
+                                <input type="text" name="newFileName" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File:</h2></u>
+                            <form id="formUpload" action="/uploadUpdate?name=AndroidOS" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File to Update:</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                    </div>
+                    <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
+                        <b><a href="/65432987655">Home |</a></b>
+                        <a href="/database">Full Database</a></b>         
+                    </div>
+                </body>
+
+                <script>       
+                    document.getElementById("formUpload").reset();
+                </script>
+
+            </html>
