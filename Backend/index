@@ -577,6 +577,50 @@ const server = http.createServer((request, response)=>{
         }})
     }
 
+    //when your finised, change the path name to table so it pulls directly from the linked tables in database.html 
+    //but first, you need to change EACH table LINK to first go to test.html and send over the table NAME form the LINK, then from test.html you can USE that provided table name to FETCH /table with the CORRECT table name to upload the correct SKU!!!
+    else if (parsedUrl.pathname == "/tabletest"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
+
+            connection.query(`SELECT * FROM ${tableName}`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+
+            //Function to grab raw image data for sku photo
+            //this needs to be sent to the front end some how 
+            function getBase64Data(){
+            let blobData = '';
+            let max = jsonObject.length -1;
+            while (max > -1){
+                if (jsonObject[max].FileName !== null){
+                    if(jsonObject[max].FileName == "Product Image"){
+                        blobData = jsonObject[max].File;
+                        //converting raw image blob to base64 string to display in browser
+                        const bufferFromString = Buffer.from(blobData.data, 'utf8');
+                        const base64String1 = bufferFromString.toString('base64'); 
+                        return base64String1;
+                    }
+                }
+                max--;
+                }
+            }
+
+            //the page that generates from each sku link
+            response.write(readRows(jsonObject, tableName));
+            response.end();
+        }})})
+    }
+
     //serves page home.html
    else if (url.includes("/65432987655")){
         response.writeHead(200, {

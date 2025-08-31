@@ -24,7 +24,7 @@
                     }
                 </style>
                 <head>
-                    <title>Database: AndroidOS</title>
+                    <title  id=>Database: AndroidOS</title>
                 </head>
                 <body>
                 <div id="menu">
@@ -32,13 +32,13 @@
                 <a href="/database">Full Database</a></b>
                 
                 
-                    <h1>AndroidOS</h1>
-                    <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300" alt=" "/>
+                    <h1>Table Name</h1>
+                     
                     
                     <div>
                     <ul id="myList2"></ul>
                     <h3><b><i>Refresh to see changes! Use ctrl+F to search for any entry.</i></b></h3>
-                    <b>${readRows(jsonObject, tableName)}</b>
+                    <b id="test">Loading table...</b>
                     </div>
                     
                 </div>
@@ -127,6 +127,28 @@
 
                 <script>       
                     document.getElementById("formUpload").reset();
+        async function getData(){
+            try{
+                const response = await fetch("/tabletest?name=AndroidOS");
+                if (response.ok){
+                    const text = await response.text();
+                    console.log(text);
+                    console.log("hi");
+                    x = document.getElementById('test');
+                    x.innerHTML = text;
+
+                
+                } 
+                else{
+                    console.log("Error fetching data");
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }    
+    getData();
                 </script>
 
             </html>
