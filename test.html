@@ -33,6 +33,7 @@
                 
                 
                     <h1>Table Name</h1>
+                    <img id="pic" width="400" height="300" alt="Loading image..."/>
                      
                     
                     <div>
@@ -126,14 +127,13 @@
                 </body>
 
                 <script>       
+                //fetch request for sku specific table 
                     document.getElementById("formUpload").reset();
         async function getData(){
             try{
                 const response = await fetch("/tabletest?name=AndroidOS");
                 if (response.ok){
                     const text = await response.text();
-                    console.log(text);
-                    console.log("hi");
                     x = document.getElementById('test');
                     x.innerHTML = text;
 
@@ -148,7 +148,33 @@
                 console.log('Error:', error);
             }
     }    
-    getData();
+    getData(); //initiates fetch request
+
+    //fetch request to get sku specific photo 
+        async function getPhoto(){
+            console.log("in photo function");
+            try{
+                const response = await fetch("/photo?name=AndroidOS");
+                if (response.ok){
+                    const text = await response.text();
+                    let x = document.getElementById("pic");
+                    x.src = "data:image/png;base64," + text;
+                
+                } 
+                else{
+                    console.log("Error fetching data");
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }       
+    getPhoto();
+
+    
+
+
                 </script>
 
             </html>
