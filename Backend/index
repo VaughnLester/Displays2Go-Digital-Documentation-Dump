@@ -378,7 +378,8 @@ const server = http.createServer((request, response)=>{
 
     //table - attaches to table list as a link per table that selects all from the table, in database.html file 
     //table is the path from the link
-    else if (parsedUrl.pathname == "/table"){
+    //here is the original, redone below in path /table
+    else if (parsedUrl.pathname == "/originalSKUtablepage"){
         let body = " ";
         request.on('data', chunk => {body += chunk.toString()})
         request.on('end', ()=>{
@@ -579,7 +580,7 @@ const server = http.createServer((request, response)=>{
 
     //when your finised, change the path name to table so it pulls directly from the linked tables in database.html 
     //but first, you need to change EACH table LINK to first go to test.html and send over the table NAME form the LINK, then from test.html you can USE that provided table name to FETCH /table with the CORRECT table name to upload the correct SKU!!!
-    else if (parsedUrl.pathname == "/tabletest"){
+    else if (parsedUrl.pathname == "/table"){
         let body = " ";
         request.on('data', chunk => {body += chunk.toString()})
         request.on('end', ()=>{

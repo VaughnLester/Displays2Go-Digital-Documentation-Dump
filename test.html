@@ -32,7 +32,7 @@
                 <a href="/database">Full Database</a></b>
                 
                 
-                    <h1>Table Name</h1>
+                    <h1 id="title">Loading table name...</h1>
                     <img id="pic" width="400" height="300" alt="Loading image..."/>
                      
                     
@@ -126,12 +126,17 @@
                     </div>
                 </body>
 
-                <script>       
+                <script>    
+                
+
+
                 //fetch request for sku specific table 
                     document.getElementById("formUpload").reset();
         async function getData(){
             try{
-                const response = await fetch("/tabletest?name=AndroidOS");
+                const url = new URL(window.location.href)
+                const searchParams = new URLSearchParams(url.search);
+                const response = await fetch("/table?name="+searchParams.get('name'));
                 if (response.ok){
                     const text = await response.text();
                     x = document.getElementById('test');
@@ -152,9 +157,10 @@
 
     //fetch request to get sku specific photo 
         async function getPhoto(){
-            console.log("in photo function");
             try{
-                const response = await fetch("/photo?name=AndroidOS");
+                const url = new URL(window.location.href)
+                const searchParams = new URLSearchParams(url.search);
+                const response = await fetch("/photo?name="+searchParams.get('name'));
                 if (response.ok){
                     const text = await response.text();
                     let x = document.getElementById("pic");
@@ -172,6 +178,14 @@
     }       
     getPhoto();
 
+    //getting sku table name
+    function getTitle(){
+        const url = new URL(window.location.href)
+        const searchParams = new URLSearchParams(url.search);
+        let title = document.getElementById('title');
+        title.innerHTML = searchParams.get('name');
+    }
+    getTitle();
     
 
 
