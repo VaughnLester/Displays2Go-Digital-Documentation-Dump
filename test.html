@@ -47,7 +47,7 @@
                     <div class="container">
                         <div id="addEntryForm">
                             <u><h2>Add Link:</h2></u>
-                            <form id="addSkuEntry" action="/addEntry?name=AndroidOS" method="post">
+                            <form id="addSkuEntry"  method= "post">
                                 <label for="title">Link Name:</label><br>
                                 <input type="text" id="title" name="title" required><br>
                                 <label for="skuEntry">Link:</label><br>
@@ -112,7 +112,7 @@
                         </div>
                         <div>
                             <u><h2>Update File:</h2></u>
-                            <form id="formUpload" action="/uploadUpdate?name=AndroidOS" method="post" enctype="multipart/form-data">
+                            <form id="formUploadUpdate" action="/uploadUpdate?name=${getTableName()}" method="post" enctype="multipart/form-data">
                                 <label for="originalfileName">File to Update:</label><br>
                                 <input type="text" id="originalfileName" name="originalfileName" required><br>
                                 <input type="file" name="filetoupload" required><br>
@@ -178,7 +178,7 @@
     }       
     getPhoto();
 
-    //getting sku table name
+    //getting and applying sku table name
     function getTitle(){
         const url = new URL(window.location.href)
         const searchParams = new URLSearchParams(url.search);
@@ -186,8 +186,42 @@
         title.innerHTML = searchParams.get('name');
     }
     getTitle();
-    
 
+    //geting just the sku table name
+    function getTableName(){
+        const url = new URL(window.location.href)
+        const searchParams = new URLSearchParams(url.search);
+        return searchParams.get('name');
+    }
+
+    //updating forms manually to ensure table name is provided for each form
+
+
+    const a = document.getElementById('addSkuEntry');
+    a.action = `/addEntry?name=${getTableName()}`;
+
+    const b = document.getElementById('deleteSKUentry');
+    b.action = `/deleteData?name=${getTableName()}`;
+
+    const c = document.getElementById('updateSKUentryTitle');
+    c.action = `/updateTitle?name=${getTableName()}`;
+
+    const d = document.getElementById('updateSKUentry');
+    d.action = `/updateEntry?name=${getTableName()}`;
+
+    const e = document.getElementById('formUpload');
+    e.action = `/upload?name=${getTableName()}`;
+
+    const f = document.getElementById('deleteSKUfile');
+    f.action = `/deleteFile?name=${getTableName()}`;
+
+    const g = document.getElementById('formUpdateFileName');
+    g.action = `/updateFileName?name=${getTableName()}`;
+
+    const h = document.getElementById('formUploadUpdate');
+    h.action = `/uploadUpdate?name=${getTableName()}`;
+
+    
 
                 </script>
 

@@ -527,7 +527,7 @@ const server = http.createServer((request, response)=>{
                         </div>
                         <div>
                             <u><h2>Update File:</h2></u>
-                            <form id="formUpload" action="/uploadUpdate?name=${tableName}" method="post" enctype="multipart/form-data">
+                            <form id="formUploadUpdate" action="/uploadUpdate?name=${tableName}" method="post" enctype="multipart/form-data">
                                 <label for="originalfileName">File to Update:</label><br>
                                 <input type="text" id="originalfileName" name="originalfileName" required><br>
                                 <input type="file" name="filetoupload" required><br>
