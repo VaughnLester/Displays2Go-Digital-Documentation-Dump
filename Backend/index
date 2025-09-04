@@ -655,13 +655,14 @@ const server = http.createServer((request, response)=>{
                         return base64String1;
                     }
                 }
+
                 max--;
                 }
             }
 
-            //the page that generates from each sku link
-            response.write(getBase64Data());
-            response.end();
+            
+            if(results == ''){response.end();}//if there is no data added yet
+            else{response.end(getBase64Data());}
         }})})
     }
 
