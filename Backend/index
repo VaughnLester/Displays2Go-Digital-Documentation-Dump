@@ -1,3 +1,5 @@
+
+
 const http = require('http'); 
 const mysql = require('mysql2'); 
 const urlParsing = require('url'); 
@@ -833,3 +835,8 @@ function readTables(arr){
     return newResults;
 }
 
+const memoryUsage = process.memoryUsage();
+
+console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
