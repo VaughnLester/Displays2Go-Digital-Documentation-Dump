@@ -596,6 +596,14 @@ const server = http.createServer((request, response)=>{
             if (err) {response.end("error inserting data into database "+ err); return;}
             else {
             //defining the array from all tables
+
+const memoryUsage = process.memoryUsage();
+
+console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
+
+        
             jsonString = JSON.stringify(results)
             jsonObject = JSON.parse(jsonString)
 
@@ -620,6 +628,11 @@ const server = http.createServer((request, response)=>{
 
             //the page that generates from each sku link
             response.write(readRows(jsonObject, tableName));
+
+console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
+
             response.end();
         }})})
     }
