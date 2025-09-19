@@ -33,7 +33,7 @@
                 
                 
                     <h1 id="title">Loading table name...</h1>
-                    <img id="pic" width="400" height="300" alt="Loading image..."/>
+                    <!--<img id="pic" width="400" height="300" alt="Loading image..."/> -->
                      
                     
                     <div>
@@ -130,8 +130,12 @@
                 <script>    
                 
 
-
+                
                 //fetch request for sku specific table 
+
+
+                //MUST REDESIGN THIS SO IT DOESN'T PULL ALL DATA INTO ONE PAGE
+                //BECAUSE THIS PROCESS IS TOO MEMORY INTENSIVE!!
                     document.getElementById("formUpload").reset();
         async function getData(){
             try{
@@ -177,7 +181,7 @@
                 console.log('Error:', error);
             }
     }       
-    getPhoto();
+    //getPhoto();
 
     //getting and applying sku table name as page title
     function getTitle(){
