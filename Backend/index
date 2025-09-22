@@ -592,7 +592,7 @@ const server = http.createServer((request, response)=>{
             const searchParams = new URLSearchParams(parsedUrl.search);   
             const tableName = searchParams.get('name');
 
-            connection.query(`SELECT * FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
+            connection.query(`SELECT FileName FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
             if (err) {response.end("error inserting data into database "+ err); return;}
             else {
             //defining the array from all tables
