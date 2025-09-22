@@ -554,7 +554,7 @@ const server = http.createServer((request, response)=>{
     //File Handler: reads files that are attached to each SKU 
     else if (url.includes("/read")){
         const params = new URLSearchParams(url);
-        connection.query(`SELECT * FROM ${params.get('table')} WHERE OriginalFileName = "${params.get('filename')}"`, (err, results) =>{
+        connection.query(`SELECT * FROM ${params.get('table')} WHERE FileName = "${params.get('filename')}"`, (err, results) =>{
         if (err) {console.log(err); return;}
         else {
             async function blobToFile(blob, fileName) {
@@ -804,11 +804,12 @@ function readRows(arr,sku){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
+        console.log("the arr original file name: "+ arr[max].originalFilename);
     //normal line for all sku table, temp disabled for testing
     //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
 
     //handles files
-    if (arr[max].File !== null){results += `<li><a id="entryList" href="/read?sku=${sku}&filename=${arr[max].OriginalFileName}&table=${sku}">${arr[max].FileName}</a></li> `;}
+    if (arr[max].FileName !== null){results += `<li><a id="entryList" href="/read?sku=${sku}&filename=${arr[max].FileName}&table=${sku}">${arr[max].FileName}</a></li> `;}
 
     //handles links 
 
