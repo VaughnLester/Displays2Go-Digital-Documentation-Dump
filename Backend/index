@@ -59,7 +59,7 @@ const server = http.createServer((request, response)=>{
             fields.title[0] = fields.title[0].replace('\\\\','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
             fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
-            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry, FileName) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}", "${fields.title[0]}")`, (err, results) =>{
+            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
             if (err) {response.end(err.toString()); return;}
             else {response.end(`Entry ${fields.title[0]} added to ${params.get('name')}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
                                             <script>
@@ -595,15 +595,7 @@ const server = http.createServer((request, response)=>{
             connection.query(`SELECT FileName FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
             if (err) {response.end("error inserting data into database "+ err); return;}
             else {
-            //defining the array from all tables
-
-const memoryUsage = process.memoryUsage();
-
-console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
-console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
-console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
-
-        
+            //defining the array from all tables        
             jsonString = JSON.stringify(results)
             jsonObject = JSON.parse(jsonString)
 
@@ -628,11 +620,29 @@ console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
 
             //the page that generates from each sku link
             response.write(readRows(jsonObject, tableName));
+            response.end();
+        }})})
+    }
 
-console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
-console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
-console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
+    //to grab just the links in the table
+    else if (parsedUrl.pathname == "/tableLink"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
 
+            connection.query(`SELECT Title, Entry FROM ${tableName} ORDER BY Title DESC`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables        
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+            //the page that generates from each sku link
+            response.write(readRowsLinks(jsonObject, tableName));
             response.end();
         }})})
     }
@@ -804,16 +814,11 @@ function readRows(arr,sku){
     let max = arr.length -1;
     let results = ' ';
     while (max > -1){
-        console.log("the arr original file name: "+ arr[max].originalFilename);
     //normal line for all sku table, temp disabled for testing
     //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
 
     //handles files
     if (arr[max].FileName !== null){results += `<li><a id="entryList" href="/read?sku=${sku}&filename=${arr[max].FileName}&table=${sku}">${arr[max].FileName}</a></li> `;}
-
-    //handles links 
-
-    else{results += `<li><a id="entryList" href="${arr[max].Entry}">${arr[max].Title}</a></li> `;}
     
     //new line for testing file table - temp testing
     // results += 
@@ -824,6 +829,19 @@ function readRows(arr,sku){
     }
     return results;
 }
+
+//to grab links only from the table
+function readRowsLinks(arr,sku){
+    let max = arr.length -1;
+    let results = ' ';
+    while (max > -1){
+        if(arr[max].Title !== null){
+      results += `<li><a id="entryList" href="${arr[max].Entry}">${arr[max].Title}</a></li> `;}
+      max--;
+    }
+    return results;
+}
+
 //read each table 
 function readTables(arr){
     let max = arr.length -1;
