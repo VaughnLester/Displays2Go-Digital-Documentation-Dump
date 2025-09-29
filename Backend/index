@@ -92,31 +92,36 @@ const server = http.createServer((request, response)=>{
                 fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
                 //removing unaccepted text in original file name 
                 files.filetoupload[0].originalFilename = files.filetoupload[0].originalFilename.replace('"', '');
-                files.filetoupload[0].originalFilename = files.filetoupload[0].originalFilename.replace('\\\\', '');                
-                connection.query(`INSERT INTO ${params.get('name')} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
-                    if(err){response.end(err.toString()); console.log(err); return;}
-                    response.end(`
-                        <!DOCTYPE html>
-                        <html>
-                        
-                        
-                        
-                        ${fields.originalfileName[0]} uploaded to sku ${params.get('name')} and saved to database!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                files.filetoupload[0].originalFilename = files.filetoupload[0].originalFilename.replace('\\\\', '');  
+                //check for file size to prevent database crashing
+                //checks for 5MB in bytes
+                if(files.filetoupload[0].size > 5 * 1024 * 1024) {response.end("Fie size larger than 5MB! Please compress the file to 5MB or below.")}  
+                else{            
+                    connection.query(`INSERT INTO ${params.get('name')} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                        if(err){response.end(err.toString()); console.log(err); return;}
+                        response.end(`
+                            <!DOCTYPE html>
+                            <html>
+                            
+                            
+                            
+                            ${fields.originalfileName[0]} uploaded to sku ${params.get('name')} and saved to database!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
 
-                               <script>
-                
-
-
-            setTimeout(function() {
-                history.back();
-            }, 1000); // in milliseconds
+                                <script>
                     
-            
-            </script>
 
-                    </html>
-                    `);
-                });
+
+                setTimeout(function() {
+                    history.back();
+                }, 1000); // in milliseconds
+                        
+                
+                </script>
+
+                        </html>
+                        `);
+                    });
+                }
             })
         })
     }
