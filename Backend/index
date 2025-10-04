@@ -565,7 +565,8 @@ const server = http.createServer((request, response)=>{
             async function blobToFile(blob, fileName) {
             const arrayBuffer = await blob.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-            if((fileName.includes(".docx"))|fileName.includes(".xlsx")){
+            //downloads certain files 
+            if((fileName.includes(".docx"))|fileName.includes(".xlsx")|fileName.includes(".mp4")){
                 response.writeHead(200, {
                     "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     "Content-Length": Buffer.byteLength(buffer),
@@ -573,6 +574,7 @@ const server = http.createServer((request, response)=>{
                 });
                     response.end(buffer)
                 }
+                //opens other files directly 
                 else{response.end(buffer);}
             }
             async function example() {
