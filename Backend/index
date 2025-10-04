@@ -566,7 +566,7 @@ const server = http.createServer((request, response)=>{
             const arrayBuffer = await blob.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             //downloads certain files 
-            if((fileName.includes(".docx"))|fileName.includes(".xlsx")|fileName.includes(".mp4")){
+            if((fileName.includes(".docx"))|fileName.includes(".xlsx")|fileName.includes(".mp4")|fileName.includes(".mov")){
                 response.writeHead(200, {
                     "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     "Content-Length": Buffer.byteLength(buffer),
