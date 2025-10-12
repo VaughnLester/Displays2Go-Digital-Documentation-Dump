@@ -2,17 +2,18 @@
             <html>
                 <style>
                     body{
-
+                        
                     }
                     .container{
                         
+                        background: #f0f0f0;
                         display: grid;
                         grid-template-columns: auto auto;
+                        border-color: black;
                         
                     }
                     .container > div{
-                        
-                        
+                        padding-left: 20px;
                         border-color: black;
                     }
                     #menu{
@@ -28,7 +29,7 @@
                 </head>
                 <body>
                 <div id="menu">
-                <b><a href="/65432987655">Home |
+                <b>
                 <a href="/database">Full Database</a></b>
                 
                 
@@ -89,7 +90,7 @@
                         <div>
                             <u><h2>Add File:</h2></u>
                             <form id="formUpload" action="/upload?name=AndroidOS" method="post" enctype="multipart/form-data">
-                                <label for="originalfileName">File Name: ("Product Image" to add image)</label><br>
+                                <label for="originalfileName">File Name:</label><br>
                                 <input type="text" id="originalfileName" name="originalfileName" required><br>
                                 <input type="file" name="filetoupload" required><br>
                                 <input type="submit">
@@ -123,9 +124,10 @@
                             </form>
                         </div>
                     </div>
+
                     <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
-                        <b><a href="/65432987655">Home |</a></b>
-                        <a href="/database">Full Database</a></b>         
+
+                        <b><a href="/database">Full Database</a></b>         
                     </div>
                 </body>
 

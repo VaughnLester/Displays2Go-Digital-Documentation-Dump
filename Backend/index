@@ -34,7 +34,7 @@ const server = http.createServer((request, response)=>{
                 
 
             setTimeout(function() {
-                window.location.href = "/65432987655";
+                window.location.href = "/database";
             }, 1000); // in milliseconds
                     
             
@@ -143,7 +143,7 @@ const server = http.createServer((request, response)=>{
 
 
             setTimeout(function() {
-                window.location.href = "/65432987655";
+                window.location.href = "/database";
             }, 1000); // in milliseconds
                     
             
@@ -223,7 +223,7 @@ const server = http.createServer((request, response)=>{
 
 
             setTimeout(function() {
-                window.location.href = "/65432987655";
+                window.location.href = "/database";
             }, 1000); // in milliseconds
                     
             

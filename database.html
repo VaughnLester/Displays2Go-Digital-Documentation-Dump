@@ -17,18 +17,59 @@
 }
 
 #databaseList {
-    background: #f0f0f0; /* Optional background color */
+     /* Optional background color */
     padding: 10px;
     box-sizing: border-box;
+                        float: left;
+                        width: 1000px;
+}
+.container {
+    float: right;
+    width: 300px;
+    background: #f0f0f0;
+    padding: 10px;
+
 }
     </style>
     <body>
-        <b><a href="/65432987655">Home</a></b>
         <h1><u>Full Database</u></h1>
+    <div id=dList>
         <ul id="databaseList"></ul>
+    </div>
+            <div class="container">
+            <div id="addSKUbox">
+                <header><h1> ADD A SKU</h1></header>
+                <form id="addNewSku" action="/newSKU" method="post">
+                    <label for="sku">SKU:</label><br> 
+                    <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+            <div id="deleteSKUbox">
+                <header><h1> DELETE SKU</h1></header>
+                <form id="deleteSKU" action="/deleteSKU" method="post">
+                    <label for="sku">SKU:</label><br>
+                    <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+            <div id="changeSKUbox">
+                <header><h1> UPDATE SKU</h1></header>
+                <form id="changeSKU" action="/changeSKU" method="post">
+                    <label for="sku">SKU:</label><br>
+                    <input type="text" id="sku" name="sku" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+                    <label for="newSKU">Updated SKU Name:</label><br>
+                    <input type="text" id="newSKU" name="newSKU" placeholder="Must not be only numbers" pattern="[a-zA-Z0-9.]+" title="No spaces/special characters" required><br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+
+
+<!-- 
         <div style="position:fixed; left:0; bottom:0; font-weight: bold;">
             <a href="/65432987655">Home</a>        
-        </div>
+        </div> -->
 
     </body>
     <script>
