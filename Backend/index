@@ -303,20 +303,23 @@ const server = http.createServer((request, response)=>{
                 if(err){response.end(err.toString()); console.log(err);return;}
                 fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
                 fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
-                connection.query(`UPDATE ${params.get('name')} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
-                    if(err){response.end(err.toString()); console.log(err); return;}
-                    response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
-                                                    <script>
-                
-
-
-            setTimeout(function() {
-                window.location.href = "/test?name=${params.get('name')}";
-            }, 1000); // in milliseconds
+                if(files.filetoupload[0].size > 5 * 1024 * 1024) {response.end("Fie size larger than 5MB! Please compress the file to 5MB or below.")}  
+                else{
+                    connection.query(`UPDATE ${params.get('name')} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                        if(err){response.end(err.toString()); console.log(err); return;}
+                        response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                                        <script>
                     
-            
-            </script>`);
-                });
+
+
+                setTimeout(function() {
+                    window.location.href = "/test?name=${params.get('name')}";
+                }, 1000); // in milliseconds
+                        
+                
+                </script>`);
+                    })
+            };
             })
         })
     }
