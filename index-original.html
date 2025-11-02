@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+  <style>
+    h3{
+        color: rgb(9, 9, 150);
+    }
+  </style>
+  
+  <body>
+    <!--Home Page Header-->
+    <h3 style="color:black;">Author: Vaughn Lester - Tech Support Representative</h3>
+    <u><h1>Displays2Go : Digital Documentation Database</h1></u><br>
+
+    <!-- <h1><u>Example Fetch Data</u></h1>
+    <h1 id="test">This will change if it works!</h1>
+    <h1 id="text">This will change if it works!</h1>
+    <h1 id="databasePull">This will change if it works!</h1> -->
+    
+    <!-------Forms----------->
+    <!--Action= sends the form to a url after submitting usually, but here I have added a custom submit button event to each form to do even more-->
+    <!--Reminder: Add error handling to all forms! and on backend too!-->
+
+    <!--Form to upload files/docs to database, event listener is attached to this-->
+    <form id="formUpload" action="/upload" method="post" enctype="multipart/form-data">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="originalfileName">File Name:</label><br>
+        <input type="text" id="originalfileName" name="originalfileName"><br>
+        <input type="file" name="filetoupload"><br>
+        <input type="submit">
+    </form>
+
+    <!--Only need to add input validation for input that WILL go through succssfully to the databse, but that you do NOT want to be ADDED to the database if you can think of anything you don't want in there (like swear words or a certain amount of characters in each input). Anything that produces an error from the database query will be HANDLED on the BACK end and sent to frontend!!-->
+
+    <!--Keep in mind that method "post" enables the body of the url to send as /newSKU only, and not /newSKU?+parameters which disables the proper response on the backend!!! Therefore you don't even NEED form handlers becasue you're doing the EXACT same thing in the form itself!! The only reason why'd you'd need a seperate form handler is if you're trying to send the form to a different path other than the server response, while still sending it to the server response (2 actions)!-->
+    <h3>Add SKU To Database (Must not have spaces)</h3>
+    <form id="addNewSku" action="/newSKU" method="post">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku" pattern="^\S+$" title="No spaces"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Delete SKU-->
+    <h3>Delete SKU</h3>
+    <form id="deleteSKU" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Change SKU Name-->
+    <h3>Change SKU Name</h3>
+    <form id="changeSKU" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="newSKU">New Name:</label><br>
+        <input type="text" id="newSKU" name="newSKU"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+
+    <!--Add SKU Entry-->
+    <h3>Add Data Entry</h3>
+    <form id="addSkuEntry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="skuEntry">Entry:</label><br>
+        <input type="text" id="skuEntry" name="skuEntry"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Update Data Title-->
+    <h3>Update Data Title</h3>
+    <form id="updateSKUentryTitle" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="skuEntry">Updated Entry Title:</label><br>
+        <input type="text" id="updatedTitle" name="updatedTitle"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Update Data Entry-->
+    <h3>Update Data Entry</h3>
+    <form id="updateSKUentry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="title">Entry Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="skuEntry">Entry:</label><br>
+        <input type="text" id="skuEntry" name="skuEntry"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!--Delete SKU Data-->
+    <h3>Delete SKU Data</h3>
+    <form id="deleteSKUentry" action="/confirmation">
+        <label for="sku">SKU:</label><br>
+        <input type="text" id="sku" name="sku"><br>
+        <label for="entry">Title of Entry to Delete:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h3>Database Page</h3>
+    <a href="/database">Seperate Database Page</a>
+
+  </body>
+
+  <script>
+    //Front End Requests - Form Handlers:
+    //1. Add 'submit' Event Listener to Form - use event.preventDefault() to cancel action="url" if needed
+    //2. Give it an async-await function (same as the standalone function)
+    //3. Now you can grab the form data (the entries) by using FormData class
+    //4. Create a response variable that is await for the fetch value of this forms counter part on the backend
+    //5. Send FormData parameters to the backend in the fetch request - handle request on the backend by it's specific url
+    //6. Async-Await is used here just like it is used in the normal function request by itself, your just doing it in a event listener here
+    //7. Fetch args accept the url path, and url parameters, including but not limited to method (GET,POST,PUT,DELETE), body (what your sending to backend), and headers (just the header for the content, can be text, html, etc)
+    //8. It appears as though form requests do not elicit a write response from the server, rather they will only go to the action= url
+
+//    //---------------Front End Request: --------------------
+//    const formUpload = document.getElementById('formUpload');  
+//    newSkuForm.addEventListener('submit', async (event)=> {
+//     //event.preventDefault();
+//     const formData = new FormData(formUpload);
+//     const response = await fetch ('/upload', {  
+//       method: 'POST', 
+//       body: new URLSearchParams(formData),
+//       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//     })
+//    })
+   
+    //---------------Front End Request: Create New Sku --------------------
+//    const newSkuForm = document.getElementById('addNewSku');  
+//    newSkuForm.addEventListener('submit', async (event)=> {
+//     const addNewSku = document.getElementById('addNewSku').value;
+//     //event.preventDefault();
+//     const formData = new FormData(newSkuForm);
+//     const response = await fetch ('/newSKU', {  
+//     method: 'POST', 
+//     body: new URLSearchParams(formData),
+//     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//     })      
+// })
+
+   //-------------Front End Request: Delete SKU --------------------
+   const deleteSKU = document.getElementById('deleteSKU');  
+   deleteSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(deleteSKU);
+    const response = await fetch ('/deleteSKU', {  
+      method: 'DELETE', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+
+   //-------------Front End Request: Change SKU Name --------------------
+   const changeSKU = document.getElementById('changeSKU');  
+   changeSKU.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(changeSKU);
+    const response = await fetch ('/changeSKU', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+   
+   //----------------Front End Request: Add Sku Entry --------------------
+   const addEntryForm = document.getElementById('addSkuEntry');  
+   addEntryForm.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(addEntryForm);
+    const response = await fetch ('/addEntry', {  
+      method: 'POST', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+
+   //-------------Front End Request: Update Sku Data:Title --------------------
+   const updateSKUentryTitle = document.getElementById('updateSKUentryTitle');  
+   updateSKUentryTitle.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(updateSKUentryTitle);
+    const response = await fetch ('/updateTitle', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+
+   //-------------Front End Request: Update Sku Entry --------------------
+   const updateSKUentry = document.getElementById('updateSKUentry');  
+   updateSKUentry.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(updateSKUentry);
+    const response = await fetch ('/updateEntry', {  
+      method: 'PUT', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+
+   //-------------Front End Request: Delete Sku Entry --------------------
+   const deleteSKUentry = document.getElementById('deleteSKUentry');  
+   deleteSKUentry.addEventListener('submit', async (event)=> {
+    //event.preventDefault();
+    const formData = new FormData(deleteSKUentry);
+    const response = await fetch ('/deleteData', {  
+      method: 'DELETE', 
+      body: new URLSearchParams(formData),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+   })
+
+
+//    fetch('/blob', {
+//   method: 'GET',
+//   responseType: 'blob',
+// })
+//   .then(response => response.blob())
+//   .then(blob => {
+//     console.log("response received");
+//     blobToPdf(blob, 'my-document.pdf');
+//   });
+
+const bufferData = Buffer.from({ size: 12, type: 'text/plain' });
+console.log(bufferData);
+
+   function blobToPdf(blob, filename = 'document.pdf') {
+    alert("in pdf function");
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+//blobToPdf({ size: 12, type: 'text/plain' }, "new file");
+
+
+  </script>
+</html>

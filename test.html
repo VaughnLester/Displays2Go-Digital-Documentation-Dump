@@ -1,0 +1,261 @@
+          <!DOCTYPE html>
+            <html>
+                <style>
+                    body{
+                        
+                    }
+                    .container{
+                        position: fixed;
+                        right: 10%;
+                        background: #f0f0f0;
+                        display: grid;
+                        grid-template-columns: auto auto;
+                        border-color: black;
+                        
+                    }
+                    .container > div{
+                        padding-left: 20px;
+                        border-color: black;
+                    }
+                    #menu{
+                        float: left;
+                        width: 800px;
+                    }
+                    #entryList{
+                       
+                    }
+                </style>
+                <head>
+                    <title  id=>Database: AndroidOS</title>
+                </head>
+                <body>
+                <div id="menu">
+                <b>
+                <a href="/database">Full Database</a></b>
+                
+                
+                    <h1 id="title">Loading table name...</h1>
+                    <!--<img id="pic" width="400" height="300" alt="Loading image..."/> -->
+                     
+                    
+                    <div>
+                    <ul id="myList2"></ul>
+                    <h3>MAX FILE UPLOAD SIZE - 5MB</h3>
+                    FILES
+                    <b id="test">Loading files...</b><br>
+                    LINKS
+                    <b id="links">Loading links...</b>
+                    </div>
+                    
+                </div>
+
+                    <div class="container">
+                        <div id="addEntryForm">
+                            <u><h2>Add Link:</h2></u>
+                            <form id="addSkuEntry"  method= "post">
+                                <label for="title">Link Name:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Link:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div id="deleteEntryForm"> 
+                            <u><h2>Delete Link:</h2></u>
+                            <form id="deleteSKUentry" action="/deleteData?name=AndroidOS" method="post">
+                                <label for="entry">Name of Link to Delete:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Name:</h2></u>
+                            <form id="updateSKUentryTitle" action="/updateTitle?name=AndroidOS" method="post">
+                                <label for="title">Link Name to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Name:</label><br>
+                                <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Entry:</h2></u>
+                            <form id="updateSKUentry" action="/updateEntry?name=AndroidOS" method="post">
+                                <label for="title">Link to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Entry:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Add File:</h2></u>
+                            <form id="formUpload" action="/upload?name=AndroidOS" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File Name:</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Delete File:</h2></u>
+                            <form id="deleteSKUfile" action="/deleteFile?name=AndroidOS" method="post">
+                                <label for="fileName">Name of File to Delete:</label><br>
+                                <input type="text" id="fileName" name="fileName" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File Name</h2></u>
+                            <form id="formUpdateFileName" action="/updateFileName?name=AndroidOS" method="post" enctype="multipart/form-data">
+                                <label for="FileName">File Name:</label><br>
+                                <input type="text" name="FileName" name="newFileName" required><br>
+                                <label for="newFileName">New File Name:</label><br>
+                                <input type="text" name="newFileName" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File:</h2></u>
+                            <form id="formUploadUpdate" action="/uploadUpdate?name=${getTableName()}" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File to Update:</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                    </div>
+
+                    <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
+
+                        <b><a href="/database">Full Database</a></b>         
+                    </div>
+                </body>
+
+                <script>    
+                
+
+                
+                //fetch request for sku specific table 
+
+
+                //MUST REDESIGN THIS SO IT DOESN'T PULL ALL DATA INTO ONE PAGE
+                //BECAUSE THIS PROCESS IS TOO MEMORY INTENSIVE!!
+                    document.getElementById("formUpload").reset();
+        async function getData(){
+            try{
+                const url = new URL(window.location.href)
+                const searchParams = new URLSearchParams(url.search);
+                const response = await fetch("/table?name="+searchParams.get('name'));
+                if (response.ok){
+                    const text = await response.text();
+                    x = document.getElementById('test');
+                    x.innerHTML = text;
+
+                
+                } 
+                else{
+                    console.log("Error fetching data");
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }    
+    getData(); //initiates fetch request
+
+            async function getData2(){
+            try{
+                const url = new URL(window.location.href)
+                const searchParams = new URLSearchParams(url.search);
+                const response = await fetch("/tableLink?name="+searchParams.get('name'));
+                if (response.ok){
+                    const text = await response.text();
+                    x = document.getElementById('links');
+                    x.innerHTML = text;
+
+                
+                } 
+                else{
+                    console.log("Error fetching data");
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }    
+    getData2(); //initiates fetch request
+
+    //fetch request to get sku specific photo 
+        async function getPhoto(){
+            try{
+                const url = new URL(window.location.href)
+                const searchParams = new URLSearchParams(url.search);
+                const response = await fetch("/photo?name="+searchParams.get('name'));
+                if (response.ok){
+                    const text = await response.text();
+                    let x = document.getElementById("pic");
+                    x.src = "data:image/png;base64," + text;
+                
+                } 
+                else{
+                    console.log("Error fetching data");
+                    throw new Error('Failed to fetch data');
+                }
+            }
+            catch (error){
+                console.log('Error:', error);
+            }
+    }       
+    //getPhoto();
+
+    //getting and applying sku table name as page title
+    function getTitle(){
+        const url = new URL(window.location.href)
+        const searchParams = new URLSearchParams(url.search);
+        let title = document.getElementById('title');
+        title.innerHTML = searchParams.get('name');
+    }
+    getTitle();
+
+    //geting just the sku table name
+    function getTableName(){
+        const url = new URL(window.location.href)
+        const searchParams = new URLSearchParams(url.search);
+        return searchParams.get('name');
+    }
+
+    //updating forms manually to ensure table name is provided for each form
+
+
+    const a = document.getElementById('addSkuEntry');
+    a.action = `/addEntry?name=${getTableName()}`;
+
+    const b = document.getElementById('deleteSKUentry');
+    b.action = `/deleteData?name=${getTableName()}`;
+
+    const c = document.getElementById('updateSKUentryTitle');
+    c.action = `/updateTitle?name=${getTableName()}`;
+
+    const d = document.getElementById('updateSKUentry');
+    d.action = `/updateEntry?name=${getTableName()}`;
+
+    const e = document.getElementById('formUpload');
+    e.action = `/upload?name=${getTableName()}`;
+
+    const f = document.getElementById('deleteSKUfile');
+    f.action = `/deleteFile?name=${getTableName()}`;
+
+    const g = document.getElementById('formUpdateFileName');
+    g.action = `/updateFileName?name=${getTableName()}`;
+
+    const h = document.getElementById('formUploadUpdate');
+    h.action = `/uploadUpdate?name=${getTableName()}`;
+
+    
+
+                </script>
+
+            </html>

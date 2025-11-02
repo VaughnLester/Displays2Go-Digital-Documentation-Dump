@@ -1,0 +1,884 @@
+
+
+const http = require('http'); 
+const mysql = require('mysql2'); 
+const urlParsing = require('url'); 
+const fs = require('fs'); 
+const formidable = require('formidable');
+const { Blob } = require('buffer');
+const { Buffer } = require('node:buffer');
+
+    const username = 'admin';
+    const password = 'securepassword';
+    
+
+
+//SERVER CREATEION AND API
+const server = http.createServer((request, response)=>{
+    const url = request.url;
+    const parsedUrl = urlParsing.parse(url, true)
+
+    //newSKU
+    //Creates a SKU table that has columns ID, Title, Entry, FileName, OriginalFileName, and File
+    if (url == "/newSKU"){
+        const newSKU = new formidable.IncomingForm(); 
+        newSKU.parse(request, (err, fields, files) =>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            connection.query(`CREATE TABLE ${fields.sku[0]} (entryID int NOT NULL AUTO_INCREMENT, Title varchar(255) UNIQUE, Entry varchar(255) NOT NULL, FileName varchar(255) UNIQUE,
+                OriginalFileName varchar(255), File LONGBLOB, PRIMARY KEY (entryID));`, (err, results) =>{
+                if (err){response.end("Entry must not be only numbers! " + err.toString()); return;}
+                else {response.end(`${fields.sku[0]} added to database! <br><br><a href="/home">Home</a>
+                                                    <script>
+                
+
+            setTimeout(function() {
+                window.location.href = "/database";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}
+            })
+        })  
+    }
+
+    
+
+    //addEntry
+     else if (parsedUrl.pathname == "/addEntry"){
+        const params = new URLSearchParams(parsedUrl.search);
+        console.log(params.get('name'))
+        const addEntry = new formidable.IncomingForm();
+        addEntry.parse(request, (err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err)}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
+            connection.query(`INSERT INTO ${params.get('name')} (Title, Entry) VALUES ("${fields.title[0]}", "${fields.skuEntry[0]}")`, (err, results) =>{
+            if (err) {response.end(err.toString()); return;}
+            else {response.end(`Entry ${fields.title[0]} added to ${params.get('name')}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                            <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}})
+        })
+    }
+
+    //File Handler: upload files
+    else if (parsedUrl.pathname == "/upload"){        
+        const params = new URLSearchParams(parsedUrl.search);
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end("error parsing the file: "+err); return;}
+            if(!files.filetoupload){response.end("no file uploaded");return;}
+            fs.readFile(files.filetoupload[0].filepath,(err,data) => {
+                if(err){response.end(err.toString()); console.log(err);return;}
+                //removing unaccepted text in file name, input by user
+                fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
+                fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
+                //removing unaccepted text in original file name 
+                files.filetoupload[0].originalFilename = files.filetoupload[0].originalFilename.replace('"', '');
+                files.filetoupload[0].originalFilename = files.filetoupload[0].originalFilename.replace('\\\\', '');  
+                //check for file size to prevent database crashing
+                //checks for 5MB in bytes
+                if(files.filetoupload[0].size > 5 * 1024 * 1024) {response.end("Fie size larger than 5MB! Please compress the file to 5MB or below.")}  
+                else{            
+                    connection.query(`INSERT INTO ${params.get('name')} (FileName, OriginalFileName, File) VALUES ("${fields.originalfileName[0]}", "${files.filetoupload[0].originalFilename}", ?)`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                        if(err){response.end(err.toString()); console.log(err); return;}
+                        response.end(`
+                            <!DOCTYPE html>
+                            <html>
+                            
+                            
+                            
+                            ${fields.originalfileName[0]} uploaded to sku ${params.get('name')} and saved to database!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+
+                                <script>
+                    
+
+
+                setTimeout(function() {
+                    window.location.href = "/test?name=${params.get('name')}";
+                }, 1000); // in milliseconds
+                        
+                
+                </script>
+
+                        </html>
+                        `);
+                    });
+                }
+            })
+        })
+    }
+
+    //deleteSKU 
+    else if (url == "/deleteSKU"){
+        const deleteSKU = new formidable.IncomingForm();
+        deleteSKU.parse(request,(err, fields, files) =>{
+             response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'}); 
+            if(err){response.end("error submitting form: "+err); return}     
+            connection.query(`DROP TABLE ${fields.sku[0]}`, (err, results) =>{
+            if (err) {response.end("Entry must not be only numbers! " +err.toString());return;}
+            else {response.end(`${fields.sku[0]} deleted from database!<br><br><a href="/home">Home</a> | <a href="/database">Full Database</a>
+                
+                                               <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/database";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}})
+        })
+    }
+
+    //deleteData
+    else if (parsedUrl.pathname == "/deleteData"){
+        const params = new URLSearchParams(parsedUrl.search);
+        const deleteData = new formidable.IncomingForm();
+        deleteData.parse(request,(err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString()); return;}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            connection.query(`DELETE FROM ${params.get('name')} WHERE title = "${fields.title[0]}"`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`${fields.title[0]} deleted from ${params.get('name')}! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                                <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}
+            })
+        })
+    }
+
+    //deleteFile
+    else if (parsedUrl.pathname == "/deleteFile"){
+        const params = new URLSearchParams(parsedUrl.search);
+        const deleteData = new formidable.IncomingForm();
+        deleteData.parse(request,(err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString()); return;}
+            fields.fileName[0] = fields.fileName[0].replace('"','');
+            fields.fileName[0] = fields.fileName[0].replace('\\\\','');
+            connection.query(`DELETE FROM ${params.get('name')} WHERE FileName = "${fields.fileName[0]}"`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`${fields.fileName[0]} deleted from ${params.get('name')}! (If file exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>                    
+            <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}
+            })
+        })
+    }
+
+    //changeSKU
+    else if (url == "/changeSKU"){
+        const changeSKU = new formidable.IncomingForm();
+        changeSKU.parse(request, (err,fields,files)=>{
+        response.writeHead(200, {  
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});
+        if(err){response.end(err)};
+        connection.query(`RENAME TABLE ${fields.sku[0]} to ${fields.newSKU[0]}`, (err, results) =>{
+            if (err) {response.end("Entry must not be only numbers! " +err.toString()); return;}
+            else {response.end(`${fields.sku[0]} changed to ${fields.newSKU[0]}!<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                            <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/database";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}})
+        })
+    }
+
+    //updateTitle
+    else if (parsedUrl.pathname == "/updateTitle"){
+        const params = new URLSearchParams(parsedUrl.search);
+        const updateTitle = new formidable.IncomingForm();
+        updateTitle.parse(request, (err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString()); return;}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            connection.query(`UPDATE ${params.get('name')} SET title = "${fields.updatedTitle[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{if(err){response.end(err.toString()); return;}
+            else {response.end(`Entry "${fields.title[0]}" in SKU ${params.get('name')} has been updated to "${fields.updatedTitle[0]}"! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                            <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}})
+        })
+    }
+
+    //updateEntry
+    else if (parsedUrl.pathname == "/updateEntry"){
+        const params = new URLSearchParams(parsedUrl.search);
+        const updateEntry = new formidable.IncomingForm();
+        updateEntry.parse(request,(err,fields,files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end(err.toString())}
+            fields.title[0] = fields.title[0].replace('"','');
+            fields.title[0] = fields.title[0].replace('\\\\','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('"','');
+            fields.skuEntry[0] = fields.skuEntry[0].replace('\\\\','');
+            connection.query(`UPDATE ${params.get('name')} SET entry = "${fields.skuEntry[0]}" WHERE title = "${fields.title[0]}"`, (err, results) =>{
+                if (err) {response.end(err.toString()); return;}
+                else {response.end(`Entry details for "${fields.title[0]}" in SKU ${params.get('name')} have been updated! (If entry exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                                <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);}
+            })
+        })
+    }
+
+
+    //File Handler: Upldate 
+    // upload files
+    else if (parsedUrl.pathname == "/uploadUpdate"){       
+        const params = new URLSearchParams(parsedUrl.search); 
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end("error parsing the file: "+err); return;}
+            if(!files.filetoupload){response.end("no file uploaded");return;}
+            fs.readFile(files.filetoupload[0].filepath,(err,data) => {
+                if(err){response.end(err.toString()); console.log(err);return;}
+                fields.originalfileName[0] = fields.originalfileName[0].replace('"', '');
+                fields.originalfileName[0] = fields.originalfileName[0].replace('\\\\', '');
+                if(files.filetoupload[0].size > 5 * 1024 * 1024) {response.end("Fie size larger than 5MB! Please compress the file to 5MB or below.")}  
+                else{
+                    connection.query(`UPDATE ${params.get('name')} SET File = ? WHERE FileName = "${fields.originalfileName}"`, [data], (err, results)=>{//only works with data in this parameter(not sure why)
+                        if(err){response.end(err.toString()); console.log(err); return;}
+                        response.end(`${fields.originalfileName} updated to ${files.filetoupload[0].originalFilename} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                                        <script>
+                    
+
+
+                setTimeout(function() {
+                    window.location.href = "/test?name=${params.get('name')}";
+                }, 1000); // in milliseconds
+                        
+                
+                </script>`);
+                    })
+            };
+            })
+        })
+    }
+
+        else if (parsedUrl.pathname == "/updateFileName"){       
+        const params = new URLSearchParams(parsedUrl.search); 
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if(err){response.end("error parsing the file: "+err); return;}
+            fields.FileName[0] = fields.FileName[0].replace('"', '');
+            fields.FileName[0] = fields.FileName[0].replace('\\\\', '');
+            fields.newFileName[0] = fields.newFileName[0].replace('"', '');
+            fields.newFileName[0] = fields.newFileName[0].replace('\\\\', '');
+            connection.query(`UPDATE ${params.get('name')} SET FileName = "${fields.newFileName[0]}" WHERE FileName = "${fields.FileName}"`,(err, results)=>{
+                if(err){response.end(err.toString()); console.log(err); return;}
+                response.end(`${fields.FileName} updated to ${fields.newFileName[0]} in sku ${params.get('name')}! (If it exists)<br><br><a href="/home">Home</a> | <a href="table?name=${params.get('name')}">Back to SKU</a> | <a href="/database">Full Database</a>
+                                                <script>
+                
+
+
+            setTimeout(function() {
+                window.location.href = "/test?name=${params.get('name')}";
+            }, 1000); // in milliseconds
+                    
+            
+            </script>`);
+            }); 
+        })
+    }
+
+    //database pull - used to list all tables in datbase.html file
+    //MAKE THIS ALPHABETICAL !!
+    else if (url == "/databasePull"){
+        connection.query('SHOW TABLES;', (err,results) =>{ 
+            response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            if (err){response.end(err.toString()); return;}
+            else{
+                jsonString = JSON.stringify(results);
+                jsonObject = JSON.parse(jsonString);
+                response.write(readTables(jsonObject));
+                response.end();
+            }
+        });
+    }
+
+
+    //make this path into a FORM that accepts a password
+    //if the password is correct, then send database.html
+    //if not, send "incorrect password"!
+    //database - returns databse.html file to frontend
+    else if (url == "/database"){
+            response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            fs.readFile('database.html', function(err,content){
+            if(err){response.end(err.toString());return;}
+            else{response.end(content);}
+            })
+        }
+
+
+    //table - attaches to table list as a link per table that selects all from the table, in database.html file 
+    //table is the path from the link
+    //here is the original, redone below in path /table
+    else if (parsedUrl.pathname == "/originalSKUtablepage"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
+            connection.query(`SELECT * FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+
+            //Function to grab raw image data for sku photo
+            function getBase64Data(){
+            let blobData = '';
+            let max = jsonObject.length -1;
+            while (max > -1){
+                if (jsonObject[max].FileName !== null){
+                    if(jsonObject[max].FileName == "Product Image"){
+                        blobData = jsonObject[max].File;
+                        //converting raw image blob to base64 string to display in browser
+                        const bufferFromString = Buffer.from(blobData.data, 'utf8');
+                        const base64String1 = bufferFromString.toString('base64'); 
+                        return base64String1;
+                    }
+                }
+                max--;
+                }
+            }
+            //the page that generates from each sku link
+            response.end(`    
+            <!DOCTYPE html>
+            <html>
+                <style>
+                    body{
+
+                    }
+                    .container{
+                        
+                        display: grid;
+                        grid-template-columns: auto auto;
+                        
+                    }
+                    .container > div{
+                        
+                        
+                        border-color: black;
+                    }
+                    #menu{
+                        float: left;
+                        width: 800px;
+                    }
+                    #entryList{
+                       
+                    }
+                </style>
+                <head>
+                    <title>Database: ${tableName}</title>
+                </head>
+                <body>
+                <div id="menu">
+                <b><a href="/65432987655">Home |
+                <a href="/database">Full Database</a></b>
+                
+                
+                    <h1>${tableName}</h1>
+                    <img src="data:image/png;base64,${getBase64Data()}" width="400" height="300" alt=" "/>
+                    
+                    <div>
+                    <ul id="myList2"></ul>
+                    <h3><b><i>Refresh to see changes! Use ctrl+F to search for any entry.</i></b></h3>
+                    <b>${readRows(jsonObject, tableName)}</b>
+                    </div>
+                    
+                </div>
+
+                    <div class="container">
+                        <div id="addEntryForm">
+                            <u><h2>Add Link:</h2></u>
+                            <form id="addSkuEntry" action="/addEntry?name=${tableName}" method="post">
+                                <label for="title">Link Name:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Link:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div id="deleteEntryForm"> 
+                            <u><h2>Delete Link:</h2></u>
+                            <form id="deleteSKUentry" action="/deleteData?name=${tableName}" method="post">
+                                <label for="entry">Name of Link to Delete:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Name:</h2></u>
+                            <form id="updateSKUentryTitle" action="/updateTitle?name=${tableName}" method="post">
+                                <label for="title">Link Name to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Name:</label><br>
+                                <input type="text" id="updatedTitle" name="updatedTitle"  required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update Link Entry:</h2></u>
+                            <form id="updateSKUentry" action="/updateEntry?name=${tableName}" method="post">
+                                <label for="title">Link to Update:</label><br>
+                                <input type="text" id="title" name="title" required><br>
+                                <label for="skuEntry">Updated Link Entry:</label><br>
+                                <textarea type="text" id="skuEntry" name="skuEntry" rows="3" cols="30" required></textarea><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Add File:</h2></u>
+                            <form id="formUpload" action="/upload?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File Name: ("Product Image" to add image)</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Delete File:</h2></u>
+                            <form id="deleteSKUfile" action="/deleteFile?name=${tableName}" method="post">
+                                <label for="fileName">Name of File to Delete:</label><br>
+                                <input type="text" id="fileName" name="fileName" required><br>
+                                <input type="submit" value="Submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File Name</h2></u>
+                            <form id="formUpdateFileName" action="/updateFileName?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="FileName">File Name:</label><br>
+                                <input type="text" name="FileName" name="newFileName" required><br>
+                                <label for="newFileName">New File Name:</label><br>
+                                <input type="text" name="newFileName" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                        <div>
+                            <u><h2>Update File:</h2></u>
+                            <form id="formUploadUpdate" action="/uploadUpdate?name=${tableName}" method="post" enctype="multipart/form-data">
+                                <label for="originalfileName">File to Update:</label><br>
+                                <input type="text" id="originalfileName" name="originalfileName" required><br>
+                                <input type="file" name="filetoupload" required><br>
+                                <input type="submit">
+                            </form>
+                        </div>
+                    </div>
+                    <div style="position:fixed; right:10px; bottom:0; font-weight: bold;"
+                        <b><a href="/65432987655">Home |</a></b>
+                        <a href="/database">Full Database</a></b>         
+                    </div>
+                </body>
+
+                <script>       
+                    document.getElementById("formUpload").reset();
+                </script>
+
+            </html>`);
+        }})})
+    }
+
+    //File Handler: reads files that are attached to each SKU 
+    else if (url.includes("/read")){
+        const params = new URLSearchParams(url);
+        connection.query(`SELECT * FROM ${params.get('table')} WHERE FileName = "${params.get('filename')}"`, (err, results) =>{
+        if (err) {console.log(err); return;}
+        else {
+            async function blobToFile(blob, fileName) {
+            const arrayBuffer = await blob.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            //downloads certain files 
+            if((fileName.includes(".docx"))|fileName.includes(".xlsx")|fileName.includes(".mp4")|fileName.includes(".mov")){
+                response.writeHead(200, {
+                    "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "Content-Length": Buffer.byteLength(buffer),
+                    "Content-disposition": `attachment; filename=${fileName}`
+                });
+                    response.end(buffer)
+                }
+                //opens other files directly 
+                else{response.end(buffer);}
+            }
+            async function example() {
+                try{
+                    const blob = new Blob([results[0].File], { type: "application/pdf" });
+                    await blobToFile(blob, results[0].OriginalFileName);
+                } catch (error) {response.end(error.toString()); return;}
+            }
+            example();
+        }})
+    }
+
+    //when your finised, change the path name to table so it pulls directly from the linked tables in database.html 
+    //but first, you need to change EACH table LINK to first go to test.html and send over the table NAME form the LINK, then from test.html you can USE that provided table name to FETCH /table with the CORRECT table name to upload the correct SKU!!!
+    else if (parsedUrl.pathname == "/table"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
+
+            connection.query(`SELECT FileName FROM ${tableName} ORDER BY FileName DESC`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables        
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+
+            //Function to grab raw image data for sku photo
+            //this needs to be sent to the front end some how 
+            function getBase64Data(){
+            let blobData = '';
+            let max = jsonObject.length -1;
+            while (max > -1){
+                if (jsonObject[max].FileName !== null){
+                    if(jsonObject[max].FileName == "Product Image"){
+                        blobData = jsonObject[max].File;
+                        //converting raw image blob to base64 string to display in browser
+                        const bufferFromString = Buffer.from(blobData.data, 'utf8');
+                        const base64String1 = bufferFromString.toString('base64'); 
+                        return base64String1;
+                    }
+                }
+                max--;
+                }
+            }
+
+            //the page that generates from each sku link
+            response.write(readRows(jsonObject, tableName));
+            response.end();
+        }})})
+    }
+
+    //to grab just the links in the table
+    else if (parsedUrl.pathname == "/tableLink"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
+
+            connection.query(`SELECT Title, Entry FROM ${tableName} ORDER BY Title DESC`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables        
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+            //the page that generates from each sku link
+            response.write(readRowsLinks(jsonObject, tableName));
+            response.end();
+        }})})
+    }
+
+    //serves just the sku photo 
+    else if (parsedUrl.pathname == "/photo"){
+        let body = " ";
+        request.on('data', chunk => {body += chunk.toString()})
+        request.on('end', ()=>{
+            response.writeHead(200, {  
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin' : '*'});
+            const searchParams = new URLSearchParams(parsedUrl.search);   
+            const tableName = searchParams.get('name');
+
+            connection.query(`SELECT * FROM ${tableName}`, (err, results) =>{
+            if (err) {response.end("error inserting data into database "+ err); return;}
+            else {
+            //defining the array from all tables
+            jsonString = JSON.stringify(results)
+            jsonObject = JSON.parse(jsonString)
+
+            //Function to grab raw image data for sku photo
+            //this needs to be sent to the front end some how 
+            function getBase64Data(){
+            let blobData = '';
+            let max = jsonObject.length -1;
+            while (max > -1){
+                if (jsonObject[max].FileName !== null){
+                    if(jsonObject[max].FileName == "Product Image"){
+                        blobData = jsonObject[max].File;
+                        //converting raw image blob to base64 string to display in browser
+                        const bufferFromString = Buffer.from(blobData.data, 'utf8');
+                        const base64String1 = bufferFromString.toString('base64'); 
+                        return base64String1;
+                    }
+                }
+
+                max--;
+                }
+            }
+
+            
+            if(results == ''){response.end();}//if there is no data added yet
+            else{response.end(getBase64Data());}
+        }})})
+    }
+
+    //serves page home.html
+   else if (url.includes("/65432987655")){
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        //fs.createReadStream('index.html').pipe(response);
+        fs.readFile('home.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end("error fetching index.html home file")}
+        else {
+            response.end(content);
+        }})
+    }
+
+
+    //handles the form to login to the website
+    //serves a buffer page to move to website paths 
+    else if (url.includes("/login")){
+        const form = new formidable.IncomingForm(); 
+        form.parse(request, (err, fields, files)=>{
+            const password = fields.password[0];
+            if (password == 'vaughn'){
+                response.writeHead(200, {
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin' : '*'});
+                fs.readFile('secure.html', function(err,content){
+                if(err){response.end(err.toString());return;}
+                else{response.end(content);}
+                })
+            }
+            else{response.end("Incorrect Password! Access Denied - Go back.")}
+        }
+    )}
+
+    //serves test.html 
+    else if (url.includes("/test")){
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        //fs.createReadStream('index.html').pipe(response);
+        fs.readFile('test.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end("error fetching index.html home file")}
+        else {
+            response.end(content);
+        }})
+    }
+
+    //If no route is found, defaults to login page
+    else {
+        response.writeHead(200, {
+        'Content-Type': 'text/html',
+        'Access-Control-Allow-Origin' : '*'});//enables CORS
+        //fs.createReadStream('index.html').pipe(response);
+        fs.readFile('index.html', function(err, content){
+        if (err){console.log("error occurred trying to send html file"); response.end("error fetching index.html home file")}
+        else {
+            response.end(content);
+        }})
+    }
+
+});//end server
+
+
+
+
+
+//creating database connection, hosted on freesqldatabase.com
+const connection = mysql.createConnection({
+host:'sql5.freesqldatabase.com',
+user: 'sql5768538',
+password: '9np9VjdEks',
+database: 'sql5768538'
+});
+
+
+//connecting database
+connection.connect(function(err){
+    if (err){console.log("error occurred while attempting connection: ", err)}
+    else {console.log("database connection successful!")}
+});
+
+function pingDatabase() {
+    connection.query('SELECT 1', (err, result) => {
+        if (err) {
+            console.error('MySQL connection ping failed:', err);
+                connection.connect(function(err){
+                    if (err){console.log("error occurred while attempting connection: ", err)}
+                    else {console.log("database connection successful!")}
+                });
+            if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+                console.log('Attempting to re-connect to MySQL...');
+                connection.destroy(); // Close the broken connection
+                    connection.connect(function(err){
+                        if (err){console.log("error occurred while attempting connection: ", err)}
+                        else {console.log("database connection successful!")}
+                    });
+            }
+        } else {
+            console.log('MySQL connection ping successful.');
+        }
+    });
+}
+
+
+// Ping every 30 seconds (adjust as needed, considering MySQL's wait_timeout)
+setInterval(pingDatabase, 30 * 1000);
+
+
+
+
+//connecting server
+server.listen(5001, console.log("server is listening on 5001"));
+
+
+//-------------------------------------------------------------------
+//functions used:
+
+//grab data from each row in database, add list item HTML
+//also adds a LINK to path /table with it's sku name
+          
+function readRows(arr,sku){
+    let max = arr.length -1;
+    let results = ' ';
+    while (max > -1){
+    //normal line for all sku table, temp disabled for testing
+    //results += `<li>${arr[max].Title}: ${arr[max].Entry}</li> `
+
+    //handles files
+    if (arr[max].FileName !== null){results += `<li><a id="entryList" href="/read?sku=${sku}&filename=${arr[max].FileName}&table=${sku}">${arr[max].FileName}</a></li> `;}
+    
+    //new line for testing file table - temp testing
+    // results += 
+    // `<li>${arr[max].filename}: ${arr[max].data}</li>`
+
+
+      max--;
+    }
+    return results;
+}
+
+//to grab links only from the table
+function readRowsLinks(arr,sku){
+    let max = arr.length -1;
+    let results = ' ';
+    while (max > -1){
+        if(arr[max].Title !== null){
+      results += `<li><a id="entryList" href="${arr[max].Entry}">${arr[max].Title}</a></li> `;}
+      max--;
+    }
+    return results;
+}
+
+//read each table 
+function readTables(arr){
+    let max = arr.length -1;
+    let results = ' ';
+    while (max > -1){
+    results += `${arr[max].Tables_in_sql5768538}, `;
+    //add link event listener -> goes to path that opens the table
+    
+    max--;
+    }
+    //alphabetizing the sku tables
+    newResults = '';
+    x = results.split(',');
+    x.sort();
+    y = 1;
+    while(y < x.length){
+        if(y == x.length - 1){newResults += x[y];}
+        else{
+            newResults += x[y]+',';
+        }
+        y++;
+    }
+    return newResults;
+}
+
+const memoryUsage = process.memoryUsage();
+
+console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
