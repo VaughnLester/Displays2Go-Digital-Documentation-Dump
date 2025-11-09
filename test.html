@@ -292,13 +292,11 @@
     </div>
 
     <script>    
-    //search bar needs to be fixed !
         // Function to filter the lists based on the search input
         function filterDataList() {
             const searchTerm = document.getElementById('dataSearch').value.toLowerCase();
             // Get all items within the 'test' (files) and 'links' (links) divs
-            const items = document.querySelectorAll('#test .data-item, #links .data-item');
-
+            const items = document.querySelectorAll('#test .data-item li, #links .data-item li ');
             items.forEach(item => {
                 const text = item.textContent || item.innerText;
                 if (text.toLowerCase().includes(searchTerm)) {
