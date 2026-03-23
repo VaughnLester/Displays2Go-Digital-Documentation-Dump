@@ -721,7 +721,7 @@ const server = http.createServer((request, response)=>{
         const form = new formidable.IncomingForm(); 
         form.parse(request, (err, fields, files)=>{
             const password = fields.password[0];
-            if (password == 'vaughn'){
+            if (password == '123'){
                 response.writeHead(200, {
                 'Content-Type': 'text/html',
                 'Access-Control-Allow-Origin' : '*'});
